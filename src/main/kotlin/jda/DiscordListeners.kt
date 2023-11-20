@@ -9,6 +9,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 class DiscordListeners : ListenerAdapter() {
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
+        if (event.author.isBot) {
+            return
+        }
+
         val customs = DCustomAPI.sortedMap[DiscordInteractionEnum.ON_MESSAGE_RECEIVE]
         if (!customs.isNullOrEmpty()) {
             customs.forEach { map ->

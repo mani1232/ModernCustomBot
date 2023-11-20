@@ -30,7 +30,7 @@ open class ConfigsDirectory<T>(
     fun loadDefaultFiles(clearConfigs: Boolean, files: MutableMap<String, T>) {
         if (!folder.exists()) {
             folder.mkdirs()
-            files.forEach { t, u ->
+            files.forEach { (t, u) ->
                 ConfigFile(folder.resolve(t), module, serializer).updateFile(u)
             }
         }

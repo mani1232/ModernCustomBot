@@ -23,13 +23,16 @@ sealed class Bot
 
 @SerialName("discord")
 @Serializable
-data class DiscordBot(val token: String) : Bot(), BotImpl<JDA> {
+data class DiscordBot(
+    val token: String,
+    val intents: MutableList<GatewayIntent> = mutableListOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES)
+    ) : Bot(), BotImpl<JDA> {
     @Transient
     private var bot: JDA? = null
     override fun init() {
         try {
             bot = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.DEFAULT))
-                .disableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS).build()
+                .disableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS).enableIntents(intents).build()
             bot!!.addEventListener(DiscordListeners())
         } catch (e: InvalidTokenException) {
             LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")

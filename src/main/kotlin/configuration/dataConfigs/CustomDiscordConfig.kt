@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 
@@ -32,6 +33,12 @@ data class SendText(
             event.messageChannel.sendMessage(text).queue()
         } else if (event is IReplyCallback) {
             event.reply(text).setEphemeral(ephemeral).queue()
+        } else if (event is GenericMessageEvent) {
+            if (reply && event is MessageReceivedEvent) {
+                event.message.reply(text).queue()
+            } else {
+                event.channel.sendMessage(text).queue()
+            }
         }
     }
 }
@@ -56,15 +63,15 @@ data class BotFilter(
 data class MessageFilter(
     val messageRegexPatterns: List<String>? = listOf(),
     val whitelist: Boolean = false,
-    val onlyChannel: List<ChannelType>? = listOf(ChannelType.TEXT),
+    val onlyChannel: List<ChannelType>? = listOf(ChannelType.PRIVATE),
     override val denyId: String? = null,
 ) : Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
-        if (messageRegexPatterns.isNullOrEmpty()) {
-            return false
-        }
+        if (event is MessageReceivedEvent && !onlyChannel.isNullOrEmpty() && onlyChannel.contains(event.channelType)) {
+            if (messageRegexPatterns.isNullOrEmpty()) {
+                return true
+            }
 
-        if (event is MessageReceivedEvent && !onlyChannel.isNullOrEmpty() && !onlyChannel.contains(event.channelType)) {
             return messageRegexPatterns.parallelStream()
                 .map { pattern -> Regex(pattern) }
                 .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) } && whitelist
