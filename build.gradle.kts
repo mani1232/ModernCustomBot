@@ -16,7 +16,7 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml-jvm:0.55.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.1")
     implementation("ch.qos.logback:logback-classic:1.4.11")
-    implementation("net.dv8tion:JDA:5.0.0-beta.17") {
+    implementation("net.dv8tion:JDA:5.0.0-beta.18") {
         exclude("opus-java")
     }
 

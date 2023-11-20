@@ -9,42 +9,43 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 
 
 @Serializable
+@SerialName("BotConfig")
 data class BotConfig(
     val bots: List<Bot> = ArrayList()
-)
+) : GenericData()
 
 @Serializable
-sealed class Bot {
-    @SerialName("discord")
-    @Serializable
-    data class DiscordBot(val token: String) : BotImpl<JDA> {
-        private lateinit var bot: JDA
-        override fun init() {
-            bot = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.DEFAULT)).build()
-            bot.addEventListener(DiscordListeners())
-        }
+sealed class Bot
 
-        override fun get(): JDA {
-            return bot
-        }
-
+@SerialName("discord")
+@Serializable
+data class DiscordBot(val token: String) : Bot(), BotImpl<JDA> {
+    private var bot: JDA? = null
+    override fun init() {
+        bot = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.DEFAULT)).build()
+        bot!!.addEventListener(DiscordListeners())
     }
 
-    @SerialName("telegram")
-    @Serializable
-    data class TelegramBot(val token: String) : BotImpl<Any> {
-        override fun init() {
-            return
-        }
-
-        override fun get(): Any {
-            return ""
-        }
-
+    override fun get(): JDA? {
+        return bot
     }
+
+}
+
+@SerialName("telegram")
+@Serializable
+data class TelegramBot(val token: String) : Bot(), BotImpl<Any> {
+    override fun init() {
+        return
+    }
+
+    override fun get(): Any {
+        return ""
+    }
+
 }
 
 interface BotImpl<T> {
     fun init()
-    fun get(): T
+    fun get(): T?
 }

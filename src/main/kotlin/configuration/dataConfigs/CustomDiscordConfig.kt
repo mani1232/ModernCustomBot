@@ -2,6 +2,7 @@ package configuration.dataConfigs
 
 import jda.DCustomAPI
 import jda.DiscordInteractionEnum
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.GenericEvent
@@ -10,66 +11,69 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 
 @Serializable
+@SerialName("DiscordConfig")
 data class CustomDiscordConfig(
     val interactionType: DiscordInteractionEnum = DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
     val custom: MutableMap<String, List<Custom>> = mutableMapOf()
-)
+) : GenericData()
 
 @Serializable
-sealed class Custom {
+abstract class Custom
 
-    @Serializable
-    data class SendText(
-        val text: String = "EMPTY_TEXT",
-        val reply: Boolean = false,
-        val ephemeral: Boolean = false
-    ) : Action {
-        override fun run(event: GenericEvent) {
-            if (event is GenericInteractionCreateEvent) {
-                event.messageChannel.sendMessage(text).queue()
-            } else if (event is IReplyCallback) {
-                event.reply(text).setEphemeral(ephemeral).queue()
-            }
+@Serializable
+@SerialName("sendText")
+data class SendText(
+    val text: String = "EMPTY_TEXT",
+    val reply: Boolean = false,
+    val ephemeral: Boolean = false
+) : Custom(), Action {
+    override fun run(event: GenericEvent) {
+        if (event is GenericInteractionCreateEvent) {
+            event.messageChannel.sendMessage(text).queue()
+        } else if (event is IReplyCallback) {
+            event.reply(text).setEphemeral(ephemeral).queue()
         }
     }
+}
 
-    @Serializable
-    data class BotFilter(
-        val botIds: List<Long>?,
-        val whitelist: Boolean = false,
-        override val denyId: String?,
-    ) : Filter {
-        override fun isCan(event: GenericEvent): Boolean {
-            if (botIds == null) {
-                return false
-            }
-            return botIds.contains(event.jda.selfUser.idLong) && whitelist
-        }
-    }
-
-    @Serializable
-    data class MessageFilter(
-        val messageRegexPatterns: List<String>?,
-        val whitelist: Boolean = false,
-        val onlyChannel: List<ChannelType>?,
-        override val denyId: String?,
-    ) : Filter {
-        override fun isCan(event: GenericEvent): Boolean {
-            if (messageRegexPatterns.isNullOrEmpty()) {
-                return false
-            }
-
-            if (event is MessageReceivedEvent && !onlyChannel.isNullOrEmpty() && !onlyChannel.contains(event.channelType)) {
-                return messageRegexPatterns.parallelStream()
-                    .map { pattern -> Regex(pattern) }
-                    .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) } && whitelist
-            }
-
+@Serializable
+@SerialName("botFilter")
+data class BotFilter(
+    val botIds: List<Long>?,
+    val whitelist: Boolean = false,
+    override val denyId: String?,
+) : Custom(), Filter {
+    override fun isCan(event: GenericEvent): Boolean {
+        if (botIds == null) {
             return false
         }
+        return botIds.contains(event.jda.selfUser.idLong) && whitelist
     }
-
 }
+
+@Serializable
+@SerialName("messageFilter")
+data class MessageFilter(
+    val messageRegexPatterns: List<String>?,
+    val whitelist: Boolean = false,
+    val onlyChannel: List<ChannelType>?,
+    override val denyId: String?,
+) : Custom(), Filter {
+    override fun isCan(event: GenericEvent): Boolean {
+        if (messageRegexPatterns.isNullOrEmpty()) {
+            return false
+        }
+
+        if (event is MessageReceivedEvent && !onlyChannel.isNullOrEmpty() && !onlyChannel.contains(event.channelType)) {
+            return messageRegexPatterns.parallelStream()
+                .map { pattern -> Regex(pattern) }
+                .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) } && whitelist
+        }
+
+        return false
+    }
+}
+
 
 interface Filter {
     val denyId: String?
