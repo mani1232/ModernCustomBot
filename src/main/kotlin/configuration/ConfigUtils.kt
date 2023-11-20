@@ -1,50 +1,53 @@
 package configuration
 
-import com.charleskorn.kaml.PolymorphismStyle
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
-import configuration.dataConfigs.BotConfig
+import configuration.dataConfigs.*
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
-import org.slf4j.Logger
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.serializer
 import java.io.File
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 const val MainConfigName = "CustomConfig.yml"
 
-class ConfigVault {
+class ConfigVault(path: String) {
 
-    companion object {
+    init {
+        File(path).mkdirs()
+    }
 
-        lateinit var mainConfig: ConfigFile<BotConfig>
-        val customDiscordConfig = CustomDiscordConfigDir()
-        lateinit var logger: Logger
-        lateinit var path: String
 
-        fun loadAll(pathString: String, log: Logger) {
-            path = pathString
-            logger = log
-            mainConfig = ConfigFile(File(path, MainConfigName), SerializersModule {  })
-            customDiscordConfig.loadFolderFiles(true)
+    val customsTypesList: MutableList<KType> = mutableListOf(
+        typeOf<SendText>(),
+        typeOf<BotFilter>(),
+        typeOf<MessageFilter>(),
+    )
+
+    private val customsModule = SerializersModule {
+        polymorphic(Custom::class) {
+            customsTypesList.forEach {
+                subclass(it.classifier as KClass<Custom>, serializer(it) as KSerializer<Custom>)
+            }
         }
+    }
 
-        fun reloadAll() {
-            loadAll(path, logger)
-            customDiscordConfig.loadFolderFiles(true)
-        }
+    val mainConfig: ConfigFile<BotConfig> = ConfigFile.create(File(path, MainConfigName), SerializersModule { })
+    val customDiscordConfig: ConfigsDirectory<CustomDiscordConfig> =
+        ConfigsDirectory.create(File(path, "custom/"), customsModule)
 
-        fun updateAllFiles() {
-            mainConfig.updateFile(mainConfig.data!!)
-        }
+    fun loadAll() {
+        mainConfig.loadDefaultFile(BotConfig())
+        customDiscordConfig.loadFolderFiles(true)
+    }
 
-        fun getConfiguredYaml(module: SerializersModule): Yaml {
-            return Yaml(
-                serializersModule = module,
-                configuration = YamlConfiguration(
-                    encodeDefaults = true,
-                    strictMode = false,
-                    polymorphismStyle = PolymorphismStyle.Tag,
-                    allowAnchorsAndAliases = true
-                )
-            )
-        }
+    fun reloadAll() {
+        loadAll()
+        customDiscordConfig.loadFolderFiles(true)
+    }
+
+    fun updateAllFiles() {
+        mainConfig.updateFile(mainConfig.data!!)
     }
 }

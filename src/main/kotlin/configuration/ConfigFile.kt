@@ -1,15 +1,19 @@
 package configuration
 
-import configuration.ConfigVault.Companion.getConfiguredYaml
-import configuration.dataConfigs.GenericData
+import getConfiguredYaml
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
 import org.slf4j.LoggerFactory
 import java.io.File
 
-open class ConfigFile<T : GenericData>(private val file: File, module: SerializersModule) {
+
+open class ConfigFile<T>(private val file: File, module: SerializersModule, private val serializer: KSerializer<T>) {
+
+    companion object {
+        inline fun <reified T> create(file: File, module: SerializersModule) = ConfigFile(file, module, module.serializer<T>())
+    }
 
     private val yaml = getConfiguredYaml(module)
 
@@ -17,30 +21,14 @@ open class ConfigFile<T : GenericData>(private val file: File, module: Serialize
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun updateFile(dataClass: T) {
-        data = updateFile(dataClass as GenericData) as T?
-    }
-
-    fun loadDefaultFile(dataClass: T) {
-        data = loadDefaultFile(dataClass as GenericData) as T?
-    }
-
-    fun loadFile() {
-        data = loadFile<GenericData>() as T?
-    }
-
-
-    private inline fun <reified T: GenericData> updateFile(
+    fun updateFile(
         dataClass: T
-    ) : T? {
+    ): T? {
         return try {
-            file.writer(Charsets.UTF_8).use {
-                it.write(yaml.encodeToString(dataClass))
-                it.close()
-            }
+            yaml.encodeToStream(serializer, dataClass, file.outputStream())
             dataClass
         } catch (e: SerializationException) {
-             logger.error(
+            logger.error(
                 """Error in file: ${file.name}
                             ${e.message}""".trimIndent()
             )
@@ -48,36 +36,29 @@ open class ConfigFile<T : GenericData>(private val file: File, module: Serialize
         }
     }
 
-    private inline fun <reified T: GenericData> loadDefaultFile(
+    fun loadDefaultFile(
         dataClass: T
-    ) : T?{
-        try {
-            return if (file.createNewFile()) {
-                file.writer(Charsets.UTF_8).use {
-                    it.write(yaml.encodeToString(dataClass))
-                    it.close()
-                }
+    ): T? {
+        return try {
+            if (file.createNewFile()) {
+                updateFile(dataClass)
                 dataClass
             } else {
-                yaml.decodeFromString(file.reader().use {
-                    it.readLines().joinToString(separator = "\n")
-                })
+                loadFile()
             }
         } catch (e: SerializationException) {
             logger.error(
                 """Error in file: ${file.name}
-                            ${e.message}""".trimIndent()
+                                ${e.message}""".trimIndent()
             )
-            return null
+            null
         }
     }
 
-    private inline fun <reified T: GenericData> loadFile(
+    fun loadFile(
     ): T? {
         return try {
-            yaml.decodeFromString(file.reader().use {
-                it.readLines().joinToString(separator = "\n")
-            })
+            yaml.decodeFromStream(serializer, file.inputStream())
         } catch (e: SerializationException) {
             logger.error(
                 """Error in file: ${file.name}

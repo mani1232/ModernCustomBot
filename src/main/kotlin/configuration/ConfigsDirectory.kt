@@ -1,13 +1,21 @@
 package configuration
 
-import configuration.dataConfigs.GenericData
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
+import org.slf4j.LoggerFactory
 import java.io.File
 
-open class ConfigsDirectory<T: GenericData>(private val folder: File, private val module: SerializersModule) {
+open class ConfigsDirectory<T>(private val folder: File, private val module: SerializersModule, private val serializer: KSerializer<T>) {
 
     val dirConfigFiles = mutableListOf<ConfigFile<T>>()
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
+
+    companion object {
+        inline fun <reified T> create(file: File, module: SerializersModule) = ConfigsDirectory(file, module, module.serializer<T>())
+    }
 
     fun loadFolderFiles(clearConfigs: Boolean) {
 
@@ -19,11 +27,11 @@ open class ConfigsDirectory<T: GenericData>(private val folder: File, private va
 
         folder.listFiles()?.filter { it.extension == "yml" || it.extension == "yaml" }?.map { file ->
             try {
-                val tempCfg = ConfigFile<T>(file, module)
+                val tempCfg = ConfigFile(file, module, serializer)
                 tempCfg.loadFile()
                 dirConfigFiles.add(tempCfg)
             } catch (e: SerializationException) {
-                ConfigVault.logger.error(
+                logger.error(
                     """Error in file: ${file.name}
                             ${e.message}""".trimIndent()
                 )

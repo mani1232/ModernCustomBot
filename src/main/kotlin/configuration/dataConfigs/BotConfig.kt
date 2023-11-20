@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 @SerialName("BotConfig")
 data class BotConfig(
     val bots: List<Bot> = ArrayList()
-) : GenericData()
+)
 
 @Serializable
 sealed class Bot

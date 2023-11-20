@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.0.0-Beta1"
     kotlin("plugin.serialization") version "2.0.0-Beta1"
     application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "cc.worldmandia"
@@ -22,9 +23,14 @@ dependencies {
 
     testImplementation(kotlin("test"))
 }
+tasks {
+    test {
+        useJUnitPlatform()
+    }
 
-tasks.test {
-    useJUnitPlatform()
+    shadowJar {
+
+    }
 }
 
 kotlin {

@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 data class CustomDiscordConfig(
     val interactionType: DiscordInteractionEnum = DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
     val custom: MutableMap<String, List<Custom>> = mutableMapOf()
-) : GenericData()
+)
 
 @Serializable
 abstract class Custom
