@@ -54,10 +54,10 @@ data class BotFilter(
 @Serializable
 @SerialName("messageFilter")
 data class MessageFilter(
-    val messageRegexPatterns: List<String>?,
+    val messageRegexPatterns: List<String>? = listOf(),
     val whitelist: Boolean = false,
-    val onlyChannel: List<ChannelType>?,
-    override val denyId: String?,
+    val onlyChannel: List<ChannelType>? = listOf(ChannelType.TEXT),
+    override val denyId: String? = null,
 ) : Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         if (messageRegexPatterns.isNullOrEmpty()) {

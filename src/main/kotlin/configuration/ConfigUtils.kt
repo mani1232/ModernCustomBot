@@ -1,6 +1,7 @@
 package configuration
 
 import configuration.dataConfigs.*
+import jda.DiscordInteractionEnum
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -39,7 +40,7 @@ class ConfigVault(path: String) {
 
     fun loadAll() {
         mainConfig.loadDefaultFile(BotConfig(mutableListOf(DiscordBot("ENTER_IT_HERE"), TelegramBot("TODO"))))
-        customDiscordConfig.loadFolderFiles(true)
+        customDiscordConfig.loadDefaultFiles(true, mutableMapOf("test.yml" to CustomDiscordConfig(DiscordInteractionEnum.ON_MESSAGE_RECEIVE, mutableMapOf("custom" to listOf(MessageFilter(), SendText())))))
     }
 
     fun reloadAll() {
@@ -49,5 +50,6 @@ class ConfigVault(path: String) {
 
     fun updateAllFiles() {
         mainConfig.updateFile(mainConfig.data!!)
+        customDiscordConfig.updateAllFiles()
     }
 }

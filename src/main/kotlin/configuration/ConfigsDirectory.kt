@@ -17,8 +17,22 @@ open class ConfigsDirectory<T>(private val folder: File, private val module: Ser
         inline fun <reified T> create(file: File, module: SerializersModule) = ConfigsDirectory(file, module, module.serializer<T>())
     }
 
-    fun loadFolderFiles(clearConfigs: Boolean) {
+    fun updateAllFiles() {
+        dirConfigFiles.parallelStream().forEach { it.updateFile(it.data!!) }
+    }
 
+
+    fun loadDefaultFiles(clearConfigs: Boolean, files: MutableMap<String, T>) {
+        if (!folder.exists()) {
+            folder.mkdirs()
+            files.forEach { t, u ->
+                ConfigFile(folder.resolve(t), module, serializer).updateFile(u)
+            }
+        }
+        loadFolderFiles(clearConfigs)
+    }
+
+    fun loadFolderFiles(clearConfigs: Boolean) {
         if (clearConfigs) dirConfigFiles.clear()
 
         if (!folder.exists()) {
