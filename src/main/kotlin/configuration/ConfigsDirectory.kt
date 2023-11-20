@@ -7,14 +7,19 @@ import kotlinx.serialization.serializer
 import org.slf4j.LoggerFactory
 import java.io.File
 
-open class ConfigsDirectory<T>(private val folder: File, private val module: SerializersModule, private val serializer: KSerializer<T>) {
+open class ConfigsDirectory<T>(
+    private val folder: File,
+    private val module: SerializersModule,
+    private val serializer: KSerializer<T>
+) {
 
     val dirConfigFiles = mutableListOf<ConfigFile<T>>()
     private val logger = LoggerFactory.getLogger(this::class.java)
 
 
     companion object {
-        inline fun <reified T> create(file: File, module: SerializersModule) = ConfigsDirectory(file, module, module.serializer<T>())
+        inline fun <reified T> create(file: File, module: SerializersModule) =
+            ConfigsDirectory(file, module, module.serializer<T>())
     }
 
     fun updateAllFiles() {

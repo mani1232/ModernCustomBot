@@ -28,9 +28,10 @@ data class DiscordBot(val token: String) : Bot(), BotImpl<JDA> {
     private var bot: JDA? = null
     override fun init() {
         try {
-            bot = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.DEFAULT)).disableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS).build()
+            bot = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.DEFAULT))
+                .disableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS).build()
             bot!!.addEventListener(DiscordListeners())
-        } catch (e : InvalidTokenException) {
+        } catch (e: InvalidTokenException) {
             LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
         }
     }

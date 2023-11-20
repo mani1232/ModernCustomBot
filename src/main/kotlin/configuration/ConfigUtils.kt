@@ -40,7 +40,15 @@ class ConfigVault(path: String) {
 
     fun loadAll() {
         mainConfig.loadDefaultFile(BotConfig(mutableListOf(DiscordBot("ENTER_IT_HERE"), TelegramBot("TODO"))))
-        customDiscordConfig.loadDefaultFiles(true, mutableMapOf("test.yml" to CustomDiscordConfig(DiscordInteractionEnum.ON_MESSAGE_RECEIVE, mutableMapOf("custom" to listOf(MessageFilter(), SendText())))))
+        customDiscordConfig.loadDefaultFiles(
+            true,
+            mutableMapOf(
+                "test.yml" to CustomDiscordConfig(
+                    DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
+                    mutableMapOf("custom" to listOf(MessageFilter(), SendText()))
+                )
+            )
+        )
     }
 
     fun reloadAll() {

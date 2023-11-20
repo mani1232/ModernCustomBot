@@ -12,7 +12,8 @@ import java.io.File
 open class ConfigFile<T>(private val file: File, module: SerializersModule, private val serializer: KSerializer<T>) {
 
     companion object {
-        inline fun <reified T> create(file: File, module: SerializersModule) = ConfigFile(file, module, module.serializer<T>())
+        inline fun <reified T> create(file: File, module: SerializersModule) =
+            ConfigFile(file, module, module.serializer<T>())
     }
 
     private val yaml = getConfiguredYaml(module)
