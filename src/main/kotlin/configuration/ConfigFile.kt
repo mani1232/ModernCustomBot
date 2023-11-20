@@ -24,7 +24,7 @@ open class ConfigFile<T>(private val file: File, module: SerializersModule, priv
     fun updateFile(
         dataClass: T
     ): T? {
-        return try {
+        data = try {
             yaml.encodeToStream(serializer, dataClass, file.outputStream())
             dataClass
         } catch (e: SerializationException) {
@@ -34,12 +34,13 @@ open class ConfigFile<T>(private val file: File, module: SerializersModule, priv
             )
             null
         }
+        return data
     }
 
     fun loadDefaultFile(
         dataClass: T
     ): T? {
-        return try {
+        data = try {
             if (file.createNewFile()) {
                 updateFile(dataClass)
                 dataClass
@@ -53,11 +54,12 @@ open class ConfigFile<T>(private val file: File, module: SerializersModule, priv
             )
             null
         }
+        return data
     }
 
     fun loadFile(
     ): T? {
-        return try {
+        data = try {
             yaml.decodeFromStream(serializer, file.inputStream())
         } catch (e: SerializationException) {
             logger.error(
@@ -66,6 +68,7 @@ open class ConfigFile<T>(private val file: File, module: SerializersModule, priv
             )
             null
         }
+        return data
     }
 
 }

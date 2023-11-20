@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 
 @Serializable
-@SerialName("DiscordConfig")
+@SerialName("discordConfig")
 data class CustomDiscordConfig(
     val interactionType: DiscordInteractionEnum = DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
     val custom: MutableMap<String, List<Custom>> = mutableMapOf()

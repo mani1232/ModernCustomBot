@@ -38,7 +38,7 @@ class ConfigVault(path: String) {
         ConfigsDirectory.create(File(path, "custom/"), customsModule)
 
     fun loadAll() {
-        mainConfig.loadDefaultFile(BotConfig())
+        mainConfig.loadDefaultFile(BotConfig(mutableListOf(DiscordBot("ENTER_IT_HERE"), TelegramBot("TODO"))))
         customDiscordConfig.loadFolderFiles(true)
     }
 
