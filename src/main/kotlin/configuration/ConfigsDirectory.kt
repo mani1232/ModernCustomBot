@@ -7,24 +7,21 @@ import java.io.File
 
 open class ConfigsDirectory<T: GenericData>(private val folder: File, private val module: SerializersModule) {
 
-    val dirConfigFiles = mutableSetOf<ConfigFile<T>>()
+    val dirConfigFiles = mutableListOf<ConfigFile<T>>()
 
-    fun loadFolderFiles(): List<T> {
+    fun loadFolderFiles(clearConfigs: Boolean) {
+
+        if (clearConfigs) dirConfigFiles.clear()
+
         if (!folder.exists()) {
             folder.mkdirs()
         }
 
-        val list = mutableListOf<T>()
-
         folder.listFiles()?.filter { it.extension == "yml" || it.extension == "yaml" }?.map { file ->
             try {
                 val tempCfg = ConfigFile<T>(file, module)
-                dirConfigFiles.add(tempCfg)
                 tempCfg.loadFile()
-                val data = tempCfg.data
-                if (data != null) {
-                    list.add(data)
-                }
+                dirConfigFiles.add(tempCfg)
             } catch (e: SerializationException) {
                 ConfigVault.logger.error(
                     """Error in file: ${file.name}
@@ -32,6 +29,5 @@ open class ConfigsDirectory<T: GenericData>(private val folder: File, private va
                 )
             }
         }
-        return list
     }
 }

@@ -1,5 +1,6 @@
 package jda
 
+import configuration.ConfigFile
 import configuration.dataConfigs.Custom
 import configuration.dataConfigs.CustomDiscordConfig
 
@@ -8,9 +9,9 @@ class DCustomAPI {
     companion object {
         lateinit var sortedMap: MutableMap<DiscordInteractionEnum, MutableMap<String, List<Custom>>>
 
-        fun sort(configs: List<CustomDiscordConfig>, clear: Boolean) {
+        fun sort(configs: MutableList<ConfigFile<CustomDiscordConfig>>, clear: Boolean) {
             if (clear) sortedMap.clear()
-            configs.forEach {
+            configs.mapNotNull { it.data }.forEach {
                 if (sortedMap.containsKey(it.interactionType) && sortedMap[it.interactionType] != null) {
                     sortedMap[it.interactionType]?.putAll(it.custom)
                 } else {

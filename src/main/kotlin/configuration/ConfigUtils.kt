@@ -15,6 +15,7 @@ class ConfigVault {
     companion object {
 
         lateinit var mainConfig: ConfigFile<BotConfig>
+        val customDiscordConfig = CustomDiscordConfigDir()
         lateinit var logger: Logger
         lateinit var path: String
 
@@ -22,10 +23,12 @@ class ConfigVault {
             path = pathString
             logger = log
             mainConfig = ConfigFile(File(path, MainConfigName), SerializersModule {  })
+            customDiscordConfig.loadFolderFiles(true)
         }
 
         fun reloadAll() {
             loadAll(path, logger)
+            customDiscordConfig.loadFolderFiles(true)
         }
 
         fun updateAllFiles() {

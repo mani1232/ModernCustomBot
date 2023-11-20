@@ -1,5 +1,4 @@
 import configuration.ConfigVault
-import configuration.CustomDiscordConfigDir
 import configuration.dataConfigs.BotImpl
 import jda.DCustomAPI
 import kotlinx.coroutines.launch
@@ -15,7 +14,7 @@ fun startCustomBot() {
     runBlocking {
         ConfigVault.mainConfig.data!!.bots.forEach {
             launch {
-                DCustomAPI.sort(CustomDiscordConfigDir().loadFolderFiles(), false)
+                DCustomAPI.sort(ConfigVault.customDiscordConfig.dirConfigFiles, false)
                 (it as BotImpl<*>).init()
             }
         }
