@@ -54,7 +54,7 @@ data class BotFilter(
         if (botIds == null) {
             return false
         }
-        return botIds.contains(event.jda.selfUser.idLong) && whitelist
+        return botIds.contains(event.jda.selfUser.idLong) == whitelist
     }
 }
 
@@ -74,7 +74,7 @@ data class MessageFilter(
 
             return messageRegexPatterns.parallelStream()
                 .map { pattern -> Regex(pattern) }
-                .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) } && whitelist
+                .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) } == whitelist
         }
 
         return false

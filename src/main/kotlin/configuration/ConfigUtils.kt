@@ -6,6 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -43,9 +44,11 @@ class ConfigVault(path: String) {
         customDiscordConfig.loadDefaultFiles(
             true,
             mutableMapOf(
-                "test.yml" to CustomDiscordConfig(
+                "PingPongExample.yml" to CustomDiscordConfig(
                     DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
-                    mutableMapOf("custom" to listOf(MessageFilter(), SendText()))
+                    mutableMapOf("pingPong" to listOf(MessageFilter(onlyChannel = mutableListOf(ChannelType.PRIVATE), whitelist = true, messageRegexPatterns = mutableListOf("ping")),
+                        SendText(text = "pong", reply = true)
+                    ))
                 )
             )
         )
