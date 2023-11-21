@@ -55,7 +55,7 @@ class ConfigVault(path: String) {
     }
 
     fun reloadAll() {
-        loadAll()
+        mainConfig.loadFile()
         customDiscordConfig.loadFolderFiles(true)
     }
 
