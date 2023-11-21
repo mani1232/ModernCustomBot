@@ -21,13 +21,17 @@ class ConfigVault(path: String) {
     }
 
 
-    val customsTypesList: MutableList<KType> = mutableListOf(
+    private val customsTypesList: MutableList<KType> = mutableListOf(
         typeOf<SendText>(),
         typeOf<BotFilter>(),
         typeOf<MessageFilter>(),
     )
 
-    private val customsModule = SerializersModule {
+    fun registerCustoms(list: List<KType>) {
+        customsTypesList.addAll(list)
+    }
+
+    private var customsModule = SerializersModule {
         polymorphic(Custom::class) {
             customsTypesList.forEach {
                 subclass(it.classifier as KClass<Custom>, serializer(it) as KSerializer<Custom>)

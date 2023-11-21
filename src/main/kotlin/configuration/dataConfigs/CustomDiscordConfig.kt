@@ -6,6 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.GenericEvent
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -43,18 +44,32 @@ data class SendText(
     }
 }
 
+data class GuildFilter(
+    val longIds: List<Long>? = null,
+    val stringNames: List<String>? = null,
+    override val denyId: String?,
+    override val whitelist: Boolean
+): Custom(), Filter {
+    override fun isCan(event: GenericEvent): Boolean {
+        if (event is GenericGuildEvent) {
+            return false
+        }
+        return false
+    }
+}
+
 @Serializable
 @SerialName("botFilter")
 data class BotFilter(
     val botIds: List<Long>?,
-    val whitelist: Boolean = false,
+    override val whitelist: Boolean = false,
     override val denyId: String?,
 ) : Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         if (botIds == null) {
             return false
         }
-        return botIds.contains(event.jda.selfUser.idLong) == whitelist
+        return botIds.contains(event.jda.selfUser.idLong)
     }
 }
 
@@ -62,7 +77,7 @@ data class BotFilter(
 @SerialName("messageFilter")
 data class MessageFilter(
     val messageRegexPatterns: List<String>? = listOf(),
-    val whitelist: Boolean = false,
+    override val whitelist: Boolean = false,
     val onlyChannel: List<ChannelType>? = listOf(ChannelType.PRIVATE),
     override val denyId: String? = null,
 ) : Custom(), Filter {
@@ -74,7 +89,7 @@ data class MessageFilter(
 
             return messageRegexPatterns.parallelStream()
                 .map { pattern -> Regex(pattern) }
-                .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) } == whitelist
+                .anyMatch { regex -> regex.containsMatchIn(event.message.contentDisplay) }
         }
 
         return false
@@ -84,6 +99,8 @@ data class MessageFilter(
 
 interface Filter {
     val denyId: String?
+    val whitelist: Boolean
+
     fun isCan(event: GenericEvent): Boolean
     fun denyRun(event: GenericEvent, interactionType: DiscordInteractionEnum) {
         if (denyId == null) {
