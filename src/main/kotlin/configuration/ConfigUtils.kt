@@ -25,6 +25,7 @@ class ConfigVault(path: String) {
         typeOf<SendText>(),
         typeOf<BotFilter>(),
         typeOf<MessageFilter>(),
+        typeOf<GuildFilter>(),
     )
 
     fun registerCustoms(list: List<KType>) {

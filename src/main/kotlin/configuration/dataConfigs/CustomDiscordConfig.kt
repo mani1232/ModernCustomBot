@@ -48,11 +48,16 @@ data class GuildFilter(
     val longIds: List<Long>? = null,
     val stringNames: List<String>? = null,
     override val denyId: String?,
-    override val whitelist: Boolean
+    override val whitelist: Boolean = false
 ): Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         if (event is GenericGuildEvent) {
-            return false
+            if (!longIds.isNullOrEmpty()){
+                return longIds.contains(event.guild.idLong)
+            }
+            if (!stringNames.isNullOrEmpty()) {
+                return stringNames.contains(event.guild.name)
+            }
         }
         return false
     }
