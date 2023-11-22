@@ -15,10 +15,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 
 @Serializable
+@SerialName("interactionFilter")
 data class InteractionFilter(
     val allowIdPatterns: List<String>,
     override val denyId: String? = null, override val whitelist: Boolean = false
-): Custom(), Filter {
+) : Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         val id = when (event) {
             is SlashCommandInteractionEvent -> event.fullCommandName
@@ -44,10 +45,10 @@ data class GuildFilter(
     val stringNames: List<String>? = null,
     override val denyId: String? = null,
     override val whitelist: Boolean = false
-): Custom(), Filter {
+) : Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         if (event is GenericGuildEvent) {
-            if (!longIds.isNullOrEmpty()){
+            if (!longIds.isNullOrEmpty()) {
                 return longIds.contains(event.guild.idLong)
             }
             if (!stringNames.isNullOrEmpty()) {

@@ -10,7 +10,8 @@ import kotlin.reflect.KClass
 class DiscordListeners : ListenerAdapter() {
 
     override fun onGenericEvent(event: GenericEvent) {
-        val eventEnum = DiscordInteractionEnum.entries.parallelStream().filter { it.kType.classifier as KClass<GenericEvent> == event::class }.findFirst()
+        val eventEnum = DiscordInteractionEnum.entries.parallelStream()
+            .filter { it.kType.classifier as KClass<GenericEvent> == event::class }.findFirst()
 
         if (eventEnum.isPresent) {
             val customs = DCustomAPI.sortedMap[eventEnum.get()]

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.GenericEvent
 @SerialName("discordConfig")
 data class CustomDiscordConfig(
     val interactionType: DiscordInteractionEnum = DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
-    val custom: MutableMap<String, List<Custom>> = mutableMapOf()
+    val custom: MutableMap<String, MutableList<Custom>> = mutableMapOf()
 )
 
 @Serializable

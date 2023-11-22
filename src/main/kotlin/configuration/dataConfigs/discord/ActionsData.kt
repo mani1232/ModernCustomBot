@@ -15,24 +15,29 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 
 @Serializable
+@SerialName("deleteCommand")
 data class DeleteCommand(
     val id: String,
-): Custom(), Action {
+) : Custom(), Action {
     override fun run(event: GenericEvent) {
         event.jda.deleteCommandById(id).queue()
     }
 }
 
 @Serializable
+@SerialName("registerCommand")
 data class RegisterCommand(
     val id: String,
     val description: String,
     val options: List<COptionData> = mutableListOf(),
     val guildOnly: Boolean = false,
     val nsfwOnly: Boolean = false,
-): Custom(), Action {
+) : Custom(), Action {
     override fun run(event: GenericEvent) {
-        event.jda.upsertCommand(Commands.slash(id, description).addOptions(options.map { OptionData(it.type, it.name, it.description) }).setGuildOnly(guildOnly).setNSFW(nsfwOnly)).queue()
+        event.jda.upsertCommand(
+            Commands.slash(id, description).addOptions(options.map { OptionData(it.type, it.name, it.description) })
+                .setGuildOnly(guildOnly).setNSFW(nsfwOnly)
+        ).queue()
     }
 }
 

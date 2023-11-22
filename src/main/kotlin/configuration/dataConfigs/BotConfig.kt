@@ -25,7 +25,7 @@ sealed class Bot
 data class DiscordBot(
     val token: String,
     val intents: MutableList<GatewayIntent> = mutableListOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES)
-    ) : Bot(), BotImpl<JDA> {
+) : Bot(), BotImpl<JDA> {
     @Transient
     private var bot: JDA? = null
     override fun init() {
