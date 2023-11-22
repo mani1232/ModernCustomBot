@@ -6,6 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
@@ -56,7 +57,7 @@ data class SendText(
     val ephemeral: Boolean = false
 ) : Custom(), Action {
     override fun run(event: GenericEvent) {
-        if (event is GenericInteractionCreateEvent) {
+        if (event is GenericInteractionCreateEvent && !reply && !ephemeral) {
             event.messageChannel.sendMessage(text).queue()
         } else if (event is IReplyCallback) {
             event.reply(text).setEphemeral(ephemeral).queue()
