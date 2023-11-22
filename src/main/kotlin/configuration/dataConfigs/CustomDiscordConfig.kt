@@ -44,6 +44,7 @@ data class SendText(
     }
 }
 
+@Serializable
 data class GuildFilter(
     val longIds: List<Long>? = null,
     val stringNames: List<String>? = null,

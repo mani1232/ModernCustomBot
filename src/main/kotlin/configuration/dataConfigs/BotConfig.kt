@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.exceptions.InvalidTokenException
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.slf4j.LoggerFactory
 
 
@@ -31,8 +30,7 @@ data class DiscordBot(
     private var bot: JDA? = null
     override fun init() {
         try {
-            bot = JDABuilder.create(token, GatewayIntent.getIntents(GatewayIntent.DEFAULT))
-                .disableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS).enableIntents(intents).build()
+            bot = JDABuilder.createLight(token).enableIntents(intents).build()
             bot!!.addEventListener(DiscordListeners())
         } catch (e: InvalidTokenException) {
             LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
