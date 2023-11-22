@@ -1,6 +1,7 @@
 package configuration
 
 import configuration.dataConfigs.*
+import configuration.dataConfigs.discord.*
 import jda.DiscordInteractionEnum
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
@@ -26,6 +27,9 @@ class ConfigVault(path: String) {
         typeOf<BotFilter>(),
         typeOf<MessageFilter>(),
         typeOf<GuildFilter>(),
+        typeOf<RegisterCommand>(),
+        typeOf<DeleteCommand>(),
+        typeOf<InteractionFilter>(),
     )
 
     fun registerCustoms(list: List<KType>) {
