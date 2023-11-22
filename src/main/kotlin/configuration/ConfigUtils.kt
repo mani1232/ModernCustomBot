@@ -58,6 +58,14 @@ class ConfigVault(path: String) {
                     mutableMapOf("pingPong" to listOf(MessageFilter(onlyChannel = mutableListOf(ChannelType.PRIVATE), whitelist = true, messageRegexPatterns = mutableListOf("ping")),
                         SendText(text = "pong", reply = true)
                     ))
+                ),
+                "RegisterCommands.yml" to CustomDiscordConfig(
+                    DiscordInteractionEnum.ON_READY,
+                    mutableMapOf("helpCommand" to listOf(RegisterCommand("help", "send help info")))
+                ),
+                "ProcessCommands" to CustomDiscordConfig(
+                    DiscordInteractionEnum.ON_COMMAND,
+                    mutableMapOf("helpCommandCheck" to listOf(InteractionFilter(mutableListOf("help"), whitelist = true), SendText(text = "This is example help", ephemeral = true)))
                 )
             )
         )

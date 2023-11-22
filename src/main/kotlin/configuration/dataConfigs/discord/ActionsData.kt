@@ -27,7 +27,7 @@ data class DeleteCommand(
 data class RegisterCommand(
     val id: String,
     val description: String,
-    val options: List<COptionData>,
+    val options: List<COptionData> = mutableListOf(),
     val guildOnly: Boolean = false,
     val nsfwOnly: Boolean = false,
 ): Custom(), Action {

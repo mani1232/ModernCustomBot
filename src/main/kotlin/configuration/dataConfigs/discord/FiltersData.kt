@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 @Serializable
 data class InteractionFilter(
     val allowIdPatterns: List<String>,
-    override val denyId: String?, override val whitelist: Boolean = false
+    override val denyId: String? = null, override val whitelist: Boolean = false
 ): Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         val id = when (event) {
@@ -42,7 +42,7 @@ data class InteractionFilter(
 data class GuildFilter(
     val longIds: List<Long>? = null,
     val stringNames: List<String>? = null,
-    override val denyId: String?,
+    override val denyId: String? = null,
     override val whitelist: Boolean = false
 ): Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
@@ -63,7 +63,7 @@ data class GuildFilter(
 data class BotFilter(
     val botIds: List<Long>?,
     override val whitelist: Boolean = false,
-    override val denyId: String?,
+    override val denyId: String? = null,
 ) : Custom(), Filter {
     override fun isCan(event: GenericEvent): Boolean {
         if (botIds == null) {
