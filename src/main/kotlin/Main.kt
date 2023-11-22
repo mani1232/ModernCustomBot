@@ -17,9 +17,9 @@ fun main(args: Array<String>) {
 
 fun startCustomBot() {
     runBlocking {
+        DCustomAPI.sort(configVault.customDiscordConfig.dirConfigFiles, false)
         configVault.mainConfig.data!!.bots.forEach {
             launch {
-                DCustomAPI.sort(configVault.customDiscordConfig.dirConfigFiles, false)
                 (it as BotImpl<*>).init()
             }
         }
