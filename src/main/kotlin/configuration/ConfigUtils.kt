@@ -63,7 +63,7 @@ class ConfigVault(path: String) {
                     DiscordInteractionEnum.ON_READY,
                     mutableMapOf("helpCommand" to listOf(RegisterCommand("help", "send help info")))
                 ),
-                "ProcessCommands" to CustomDiscordConfig(
+                "ProcessCommands.yml" to CustomDiscordConfig(
                     DiscordInteractionEnum.ON_COMMAND,
                     mutableMapOf("helpCommandCheck" to listOf(InteractionFilter(mutableListOf("help"), whitelist = true), SendText(text = "This is example help", ephemeral = true)))
                 )
