@@ -3,13 +3,11 @@ package jda
 import configuration.ConfigFile
 import configuration.dataConfigs.Custom
 import configuration.dataConfigs.CustomDiscordConfig
-import org.slf4j.LoggerFactory
 
 class DCustomAPI {
 
-
     companion object {
-        val sortedMap: MutableMap<DiscordInteractionEnum, MutableMap<String, MutableList<Custom>>> = mutableMapOf()
+        private val sortedMap: MutableMap<DiscordInteractionEnum, MutableMap<String, MutableList<Custom>>> = mutableMapOf()
 
         fun sort(configs: MutableList<ConfigFile<CustomDiscordConfig>>, clear: Boolean) {
             if (clear) sortedMap.clear()
@@ -24,6 +22,10 @@ class DCustomAPI {
                     sortedMap[it.interactionType] = it.custom
                 }
             }
+        }
+
+        fun getSortedMap(): MutableMap<DiscordInteractionEnum, MutableMap<String, MutableList<Custom>>> {
+            return sortedMap
         }
     }
 

@@ -8,6 +8,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
 import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -62,7 +63,7 @@ class ConfigVault(path: String) {
                                 whitelist = true,
                                 messageRegexPatterns = mutableListOf("ping")
                             ),
-                            SendText(text = "pong", reply = true)
+                            SendText(text = "pong", reply = true, actionRows = mutableListOf(mutableListOf(ButtonConfig(ButtonStyle.DANGER, "new", emoji = "😃")), mutableListOf(ButtonConfig(ButtonStyle.SECONDARY, "new_other", label = "text"))))
                         )
                     )
                 ),

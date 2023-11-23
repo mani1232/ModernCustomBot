@@ -14,7 +14,7 @@ class DiscordListeners : ListenerAdapter() {
             .filter { it.kType.classifier as KClass<GenericEvent> == event::class }.findFirst()
 
         if (eventEnum.isPresent) {
-            val customs = DCustomAPI.sortedMap[eventEnum.get()]
+            val customs = DCustomAPI.getSortedMap()[eventEnum.get()]
             if (!customs.isNullOrEmpty()) {
                 customs.forEach { map ->
                     map.value.forEach {

@@ -4,6 +4,7 @@ import configuration.dataConfigs.Action
 import configuration.dataConfigs.Custom
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
@@ -12,6 +13,11 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.interactions.components.ItemComponent
+import net.dv8tion.jda.api.interactions.components.LayoutComponent
+import net.dv8tion.jda.api.interactions.components.buttons.Button
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 
 
 @Serializable
@@ -53,19 +59,54 @@ data class COptionData(
 data class SendText(
     val text: String = "EMPTY_TEXT",
     val reply: Boolean = false,
-    val ephemeral: Boolean = false
+    val ephemeral: Boolean = false,
+    val actionRows: List<List<ComponentConfig>>? = mutableListOf()
 ) : Custom(), Action {
     override fun run(event: GenericEvent) {
+        val components = mutableListOf<LayoutComponent>()
+        if (!actionRows.isNullOrEmpty()) {
+            actionRows.forEach {
+                components.add(ActionRow.of(it.map { comp -> comp.getComponent() }))
+            }
+        }
+
         if (event is GenericInteractionCreateEvent && !reply && !ephemeral) {
-            event.messageChannel.sendMessage(text).queue()
+            event.messageChannel.sendMessage(text)
+                .addComponents(components).queue()
         } else if (event is IReplyCallback) {
-            event.reply(text).setEphemeral(ephemeral).queue()
+            event.reply(text).setEphemeral(ephemeral).addComponents(components).queue()
         } else if (event is GenericMessageEvent) {
             if (reply && event is MessageReceivedEvent) {
-                event.message.reply(text).queue()
+                event.message.reply(text).addComponents(components).queue()
             } else {
-                event.channel.sendMessage(text).queue()
+                event.channel.sendMessage(text).addComponents(components).queue()
             }
         }
     }
+}
+
+@Serializable
+sealed class ComponentConfig: ComponentImpl()
+
+@Serializable
+@SerialName("button")
+data class ButtonConfig(
+    val buttonStyle: ButtonStyle,
+    val idOrUrl: String,
+    val label: String? = null,
+    val emoji: String? = null
+) : ComponentConfig() {
+    override fun getComponent(): ItemComponent {
+        return if (emoji == null) {
+            Button.of(buttonStyle, idOrUrl, label, null)
+        } else {
+            Button.of(buttonStyle, idOrUrl, label, Emoji.fromFormatted(emoji))
+        }
+    }
+
+}
+
+@Serializable
+abstract class ComponentImpl {
+    abstract fun getComponent(): ItemComponent
 }

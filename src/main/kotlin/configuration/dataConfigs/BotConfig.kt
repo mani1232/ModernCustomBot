@@ -32,6 +32,7 @@ data class DiscordBot(
         try {
             bot = JDABuilder.createLight(token).enableIntents(intents).build()
             bot!!.addEventListener(DiscordListeners())
+            LoggerFactory.getLogger(bot!!.selfUser.id).info("Bot `${bot!!.selfUser.name}` started!")
         } catch (e: InvalidTokenException) {
             LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
         }

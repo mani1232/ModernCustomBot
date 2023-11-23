@@ -26,7 +26,7 @@ interface Filter {
             return
         }
 
-        val denyCustoms = DCustomAPI.sortedMap[interactionType]
+        val denyCustoms = DCustomAPI.getSortedMap()[interactionType]
         if (!denyCustoms.isNullOrEmpty()) {
             val customs = denyCustoms[denyId]
             if (!customs.isNullOrEmpty()) {

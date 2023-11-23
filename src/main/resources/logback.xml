@@ -27,12 +27,12 @@
 
     <!-- Log JDA on Info while others are on Debug -->
     <logger name="net.dv8tion.jda" level="info" additivity="false">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </logger>
+        <!-- <appender-ref ref="STDOUT"/> -->
+         <appender-ref ref="FILE"/>
+     </logger>
 
-    <root level="debug">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </root>
-</configuration>
+     <root level="debug">
+         <appender-ref ref="STDOUT"/>
+         <appender-ref ref="FILE"/>
+     </root>
+ </configuration>
