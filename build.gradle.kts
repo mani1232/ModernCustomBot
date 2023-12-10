@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.parsing.parseBoolean
+
 plugins {
     kotlin("jvm") version "2.0.0-Beta1"
     kotlin("plugin.serialization") version "2.0.0-Beta1"
@@ -6,7 +8,13 @@ plugins {
 }
 
 group = "cc.worldmandia"
-version = "1.0-SNAPSHOT"
+version = findProperty("version")!! as String
+val productName = findProperty("product-name")!! as String
+val development = if (parseBoolean(findProperty("development")!! as String)) {
+    "dev"
+} else {
+    "release"
+}
 
 repositories {
     mavenCentral()
@@ -29,7 +37,7 @@ tasks {
     }
 
     shadowJar {
-
+        archiveFileName = "$productName-$version-$development.jar"
     }
 }
 
