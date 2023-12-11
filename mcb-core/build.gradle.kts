@@ -13,8 +13,6 @@ val development = if (parseBoolean(findProperty("development")!! as String)) {
 
 dependencies {
     implementation(project(path = ":mcb-api", configuration = "shadow"))
-
-    implementation("ch.qos.logback:logback-classic:1.4.14")
 }
 
 tasks {

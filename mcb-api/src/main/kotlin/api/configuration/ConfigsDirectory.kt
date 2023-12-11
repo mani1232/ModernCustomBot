@@ -7,7 +7,7 @@ import kotlinx.serialization.serializer
 import org.slf4j.LoggerFactory
 import java.io.File
 
-open class ConfigsDirectory<T>(
+open class ConfigsDirectory<T : Any>(
     private val folder: File,
     private val module: SerializersModule,
     private val serializer: KSerializer<T>
@@ -18,16 +18,16 @@ open class ConfigsDirectory<T>(
 
 
     companion object {
-        inline fun <reified T> create(file: File, module: SerializersModule) =
+        inline fun <reified T : Any> create(file: File, module: SerializersModule) =
             ConfigsDirectory(file, module, module.serializer<T>())
     }
 
-    fun updateAllFiles() {
-        dirConfigFiles.parallelStream().forEach { it.updateFile(it.data!!) }
+    suspend fun updateAllFiles() {
+        dirConfigFiles.forEach { it.updateFile(it.data.await().get()) }
     }
 
 
-    fun loadDefaultFiles(files: MutableMap<String, T>) {
+    suspend fun loadDefaultFiles(files: MutableMap<String, T>) {
         if (!folder.exists()) {
             folder.mkdirs()
             files.forEach { (t, u) ->
@@ -37,7 +37,7 @@ open class ConfigsDirectory<T>(
         loadFolderFiles()
     }
 
-    fun loadFolderFiles() {
+    suspend fun loadFolderFiles() {
         if (!folder.exists()) {
             folder.mkdirs()
         }

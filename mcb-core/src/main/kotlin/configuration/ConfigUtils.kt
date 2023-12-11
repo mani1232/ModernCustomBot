@@ -52,7 +52,7 @@ class ConfigVault(path: String) {
     val customDiscordConfig: ConfigsDirectory<CustomDiscordConfig> =
         ConfigsDirectory.create(File(path, "custom/"), customsModule)
 
-    suspend fun loadAll() = coroutineScope {
+    suspend fun loadAll() {
         mainConfig.loadDefaultFile(BotConfig(mutableListOf(DiscordBot("ENTER_IT_HERE"), TelegramBot("TODO"))))
         customDiscordConfig.loadDefaultFiles(
             mutableMapOf(
@@ -88,13 +88,13 @@ class ConfigVault(path: String) {
         )
     }
 
-    suspend fun reloadAll() = coroutineScope {
+    suspend fun reloadAll() {
         mainConfig.loadFile()
         customDiscordConfig.loadFolderFiles()
     }
 
     suspend fun updateAllFiles() = coroutineScope {
-        mainConfig.updateFile(mainConfig.data!!)
+        mainConfig.updateFile(mainConfig.data.await().get())
         customDiscordConfig.updateAllFiles()
     }
 }

@@ -22,6 +22,7 @@ subprojects {
         implementation("com.charleskorn.kaml:kaml-jvm:0.56.0")
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
         implementation("net.dv8tion:JDA:5.0.0-beta.18")
+        implementation("ch.qos.logback:logback-classic:1.4.14")
 
         implementation(kotlin("reflect"))
         testImplementation(kotlin("test"))

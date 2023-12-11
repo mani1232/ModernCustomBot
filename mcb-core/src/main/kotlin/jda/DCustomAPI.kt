@@ -9,9 +9,9 @@ class DCustomAPI {
     companion object {
         private val sortedMap: MutableMap<DiscordInteractionEnum, MutableMap<String, MutableList<Custom>>> = mutableMapOf()
 
-        fun sort(configs: MutableList<ConfigFile<CustomDiscordConfig>>, clear: Boolean) {
+        suspend fun sort(configs: MutableList<ConfigFile<CustomDiscordConfig>>, clear: Boolean) {
             if (clear) sortedMap.clear()
-            configs.mapNotNull { it.data }.forEach {
+            configs.mapNotNull { it.data.await().get() }.forEach {
                 if (sortedMap.containsKey(it.interactionType) && sortedMap[it.interactionType] != null) {
                     it.custom.forEach { (id, value) ->
                         sortedMap[it.interactionType]!!.getOrPut(id) {

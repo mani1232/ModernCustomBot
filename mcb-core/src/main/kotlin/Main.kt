@@ -25,7 +25,7 @@ suspend fun startCustomBot() = coroutineScope {
     logger.info("Sorting configs")
     DCustomAPI.sort(configVault.customDiscordConfig.dirConfigFiles, true)
     logger.info("Starting bots")
-    configVault.mainConfig.data!!.bots.forEach {
+    configVault.mainConfig.data.await().get().bots.forEach {
         thread {
             (it as BotImpl<*>).init()
         }
