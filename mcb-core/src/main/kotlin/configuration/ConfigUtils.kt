@@ -5,6 +5,7 @@ import api.configuration.ConfigsDirectory
 import configuration.dataConfigs.*
 import configuration.dataConfigs.discord.*
 import jda.DiscordInteractionEnum
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -51,10 +52,9 @@ class ConfigVault(path: String) {
     val customDiscordConfig: ConfigsDirectory<CustomDiscordConfig> =
         ConfigsDirectory.create(File(path, "custom/"), customsModule)
 
-    fun loadAll() {
+    suspend fun loadAll() = coroutineScope {
         mainConfig.loadDefaultFile(BotConfig(mutableListOf(DiscordBot("ENTER_IT_HERE"), TelegramBot("TODO"))))
         customDiscordConfig.loadDefaultFiles(
-            true,
             mutableMapOf(
                 "PingPongExample.yml" to CustomDiscordConfig(
                     DiscordInteractionEnum.ON_MESSAGE_RECEIVE,
@@ -88,12 +88,12 @@ class ConfigVault(path: String) {
         )
     }
 
-    fun reloadAll() {
+    suspend fun reloadAll() = coroutineScope {
         mainConfig.loadFile()
-        customDiscordConfig.loadFolderFiles(true)
+        customDiscordConfig.loadFolderFiles()
     }
 
-    fun updateAllFiles() {
+    suspend fun updateAllFiles() = coroutineScope {
         mainConfig.updateFile(mainConfig.data!!)
         customDiscordConfig.updateAllFiles()
     }

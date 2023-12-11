@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 
 
-open class ConfigFile<T>(private val file: File, module: SerializersModule, private val serializer: KSerializer<T>) {
+open class ConfigFile<T>(val file: File, module: SerializersModule, private val serializer: KSerializer<T>) {
 
     companion object {
         inline fun <reified T> create(file: File, module: SerializersModule) =

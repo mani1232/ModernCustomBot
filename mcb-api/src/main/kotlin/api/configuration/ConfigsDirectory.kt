@@ -27,28 +27,31 @@ open class ConfigsDirectory<T>(
     }
 
 
-    fun loadDefaultFiles(clearConfigs: Boolean, files: MutableMap<String, T>) {
+    fun loadDefaultFiles(files: MutableMap<String, T>) {
         if (!folder.exists()) {
             folder.mkdirs()
             files.forEach { (t, u) ->
                 ConfigFile(folder.resolve(t), module, serializer).updateFile(u)
             }
         }
-        loadFolderFiles(clearConfigs)
+        loadFolderFiles()
     }
 
-    fun loadFolderFiles(clearConfigs: Boolean) {
-        if (clearConfigs) dirConfigFiles.clear()
-
+    fun loadFolderFiles() {
         if (!folder.exists()) {
             folder.mkdirs()
         }
 
         folder.listFiles()?.filter { it.extension == "yml" || it.extension == "yaml" }?.map { file ->
             try {
-                val tempCfg = ConfigFile(file, module, serializer)
-                tempCfg.loadFile()
-                dirConfigFiles.add(tempCfg)
+                val existedConfig = dirConfigFiles.parallelStream().filter { file.name == it.file.name }.findFirst()
+                if (existedConfig.isPresent) {
+                    existedConfig.get().loadFile()
+                } else {
+                    val tempCfg = ConfigFile(file, module, serializer)
+                    tempCfg.loadFile()
+                    dirConfigFiles.add(tempCfg)
+                }
             } catch (e: SerializationException) {
                 logger.error(
                     """Error in file: ${file.name}
