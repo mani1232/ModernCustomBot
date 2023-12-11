@@ -6,6 +6,7 @@ build/
 .idea/
 
 ### IntelliJ IDEA ###
+CustomBot/
 logs/
 .idea/modules.xml
 .idea/jarRepositories.xml
