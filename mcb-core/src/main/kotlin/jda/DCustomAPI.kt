@@ -1,6 +1,6 @@
 package jda
 
-import configuration.ConfigFile
+import api.configuration.ConfigFile
 import configuration.dataConfigs.Custom
 import configuration.dataConfigs.CustomDiscordConfig
 

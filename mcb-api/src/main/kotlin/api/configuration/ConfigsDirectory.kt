@@ -1,4 +1,4 @@
-package configuration
+package api.configuration
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException

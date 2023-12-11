@@ -1,12 +1,8 @@
-import com.charleskorn.kaml.PolymorphismStyle
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
 import configuration.ConfigVault
 import configuration.dataConfigs.BotImpl
 import jda.DCustomAPI
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -37,15 +33,4 @@ fun startCustomBot() {
         }
         logger.info("Done!")
     }
-}
-
-fun getConfiguredYaml(module: SerializersModule): Yaml {
-    return Yaml(
-        serializersModule = module, configuration = YamlConfiguration(
-            encodeDefaults = true,
-            strictMode = false,
-            polymorphismStyle = PolymorphismStyle.Tag,
-            allowAnchorsAndAliases = true
-        )
-    )
 }

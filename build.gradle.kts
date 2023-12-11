@@ -1,50 +1,39 @@
-import org.jetbrains.kotlin.parsing.parseBoolean
-
 plugins {
-    kotlin("jvm") version "2.0.0-Beta1"
-    kotlin("plugin.serialization") version "2.0.0-Beta1"
-    application
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm") version "2.0.0-Beta1" apply true
+    kotlin("plugin.serialization") version "2.0.0-Beta1" apply false
+    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
 }
 
-group = "cc.worldmandia"
-version = findProperty("version")!! as String
-val productName = findProperty("product-name")!! as String
-val development = if (parseBoolean(findProperty("development")!! as String)) {
-    "dev"
-} else {
-    "release"
-}
+subprojects {
 
-repositories {
-    mavenCentral()
-}
+    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
-    implementation("com.charleskorn.kaml:kaml-jvm:0.55.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.1")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
-    implementation("net.dv8tion:JDA:5.0.0-beta.18") {
-        exclude("opus-java")
+    group = "cc.worldmandia"
+    version = findProperty("version")!! as String
+
+    repositories {
+        mavenCentral()
     }
 
-    testImplementation(kotlin("test"))
-}
-tasks {
-    test {
-        useJUnitPlatform()
+    dependencies {
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0-RC")
+        implementation("com.charleskorn.kaml:kaml-jvm:0.56.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
+        implementation("ch.qos.logback:logback-classic:1.4.14")
+        implementation("net.dv8tion:JDA:5.0.0-beta.18")
+
+        testImplementation(kotlin("test"))
     }
 
-    shadowJar {
-        archiveFileName = "$productName-$version-$development.jar"
+    tasks {
+        test {
+            useJUnitPlatform()
+        }
     }
-}
 
-kotlin {
-    jvmToolchain(17)
-}
-
-application {
-    mainClass.set("MainKt")
+    kotlin {
+        jvmToolchain(17)
+    }
 }

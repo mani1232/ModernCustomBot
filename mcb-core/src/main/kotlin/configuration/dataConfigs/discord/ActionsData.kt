@@ -103,8 +103,11 @@ data class ButtonConfig(
             Button.of(buttonStyle, idOrUrl, label, Emoji.fromFormatted(emoji))
         }
     }
-
 }
+
+data class StringSelectMenuConfig(
+    val id: String
+)
 
 @Serializable
 abstract class ComponentImpl {

@@ -1,5 +1,7 @@
 package configuration
 
+import api.configuration.ConfigFile
+import api.configuration.ConfigsDirectory
 import configuration.dataConfigs.*
 import configuration.dataConfigs.discord.*
 import jda.DiscordInteractionEnum

@@ -1,6 +1,5 @@
-package configuration
+package api.configuration
 
-import getConfiguredYaml
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.modules.SerializersModule
@@ -16,7 +15,7 @@ open class ConfigFile<T>(private val file: File, module: SerializersModule, priv
             ConfigFile(file, module, module.serializer<T>())
     }
 
-    private val yaml = getConfiguredYaml(module)
+    private val yaml = ConfigDefaults.getConfiguredYaml(module)
 
     var data: T? = null
 
