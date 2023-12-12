@@ -44,6 +44,7 @@ suspend fun startCustomBot() = coroutineScope {
             configVault.mainConfig.data.await()?.bots?.forEach {
                 (it as BotImpl<*>).shutdown()
             }
+            logger.info("Bye!")
         }
     })
 }

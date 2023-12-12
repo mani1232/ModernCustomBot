@@ -17,10 +17,13 @@ class DiscordListeners : ListenerAdapter() {
 
         if (eventEnum != null) {
             runBlocking {
+                var tempData = mutableMapOf<String, Any>()
+
                 val customs = DCustomAPI.getBundle(eventEnum)
                 if (!customs.isNullOrEmpty()) {
                     customs.forEach { map ->
                         map.value.forEach {
+                            it.tempData = tempData
                             if (it is Filter) {
                                 if (!it.isCan(event) == it.whitelist) {
                                     it.denyRun(event)
@@ -29,6 +32,7 @@ class DiscordListeners : ListenerAdapter() {
                             } else if (it is Action) {
                                 it.run(event)
                             }
+                            tempData = it.tempData
                         }
                     }
                 }
