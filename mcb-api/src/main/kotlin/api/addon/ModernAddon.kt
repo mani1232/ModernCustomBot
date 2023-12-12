@@ -24,4 +24,8 @@ abstract class ModernAddon {
         return ConfigFile.create<T>(File(manager().addonDirectory, "/${info().pluginName}.yml"), SerializersModule { })
     }
 
+    fun setData(data: AddonData) {
+        this.data = data
+    }
+
 }

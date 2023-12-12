@@ -43,12 +43,8 @@ class AddonManager(mainPath: String) {
                         if (!pluginFolder.exists()) {
                             pluginFolder.mkdirs()
                         }
-                        //ModernAddon::class.java.declaredFields.forEach { println(it.name) }
                         val addon = mainClass.getConstructor().newInstance() as ModernAddon
-                        addon::class.java.declaredFields.forEach { println(it.name) }
-                        val field = addon::class.java.getDeclaredField("data")
-                        field.isAccessible = true
-                        mainClass.getDeclaredField("data").set(field, AddonData(
+                        addon.setData(AddonData(
                             Info(pluginName = addonConfig.name, pluginVersion = addonConfig.version),
                             Manager(pluginFolder, classloader),
                             LoggerFactory.getLogger(mainClass)
