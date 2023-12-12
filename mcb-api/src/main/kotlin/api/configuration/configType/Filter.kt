@@ -15,7 +15,8 @@ interface Filter {
             return
         }
 
-        val interactionType =  DiscordInteractionEnum.entries.firstOrNull { it.kType.classifier as KClass<GenericEvent> == event::class }
+        val interactionType =
+            DiscordInteractionEnum.entries.firstOrNull { it.kType.classifier as KClass<GenericEvent> == event::class }
 
         if (interactionType == null) {
             return

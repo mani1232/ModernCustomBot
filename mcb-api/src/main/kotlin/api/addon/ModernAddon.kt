@@ -6,22 +6,17 @@ import java.io.File
 
 abstract class ModernAddon {
 
-    private var data: AddonData? = null
+    private lateinit var data: AddonData
 
-    fun manager(): Manager {
-        return data!!.manager
-    }
-
-    fun info(): Info {
-        return data!!.info
-    }
+    val manager = data.manager
+    val info = data.info
 
     abstract suspend fun enableAddon()
     abstract suspend fun disableAddon()
     abstract suspend fun reloadAddon()
 
     inline fun <reified T> getDefaultConfig(): ConfigFile<T> {
-        return ConfigFile.create<T>(File(manager().addonDirectory, "/${info().pluginName}.yml"), SerializersModule { })
+        return ConfigFile.create<T>(File(manager.addonDirectory, "/${info.pluginName}.yml"), SerializersModule { })
     }
 
     fun setData(data: AddonData) {

@@ -1,7 +1,7 @@
 import api.addon.ModernAddon
 import kotlinx.serialization.Serializable
 
-class MusicAddon: ModernAddon() {
+class MusicAddon : ModernAddon() {
     override suspend fun enableAddon() {
         getDefaultConfig<MusicAddonConfig>().loadDefaultFile(MusicAddonConfig("example")).await()
     }

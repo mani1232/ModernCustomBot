@@ -1,14 +1,13 @@
 package api.addon
 
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLClassLoader
 
 data class AddonData(
-    val info: Info = Info("null", "null"),
-    val manager: Manager = Manager(File("/"), URLClassLoader(arrayOf())),
-    val logger: Logger = LoggerFactory.getLogger("null")
+    val info: Info,
+    val manager: Manager,
+    val logger: Logger
 )
 
 data class Info(

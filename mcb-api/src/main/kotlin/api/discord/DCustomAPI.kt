@@ -10,7 +10,8 @@ import kotlinx.coroutines.coroutineScope
 class DCustomAPI {
 
     companion object {
-        private val sortedMap: MutableMap<DiscordInteractionEnum, Deferred<MutableMap<String, MutableList<Custom>>>> = mutableMapOf()
+        private val sortedMap: MutableMap<DiscordInteractionEnum, Deferred<MutableMap<String, MutableList<Custom>>>> =
+            mutableMapOf()
 
         fun clear() {
             sortedMap.clear()

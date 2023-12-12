@@ -4,7 +4,6 @@ import api.configuration.configType.Custom
 import api.discord.DiscordInteractionEnum
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.dv8tion.jda.api.events.GenericEvent
 
 @Serializable
 @SerialName("discordConfig")
