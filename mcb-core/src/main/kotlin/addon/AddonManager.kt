@@ -43,13 +43,13 @@ class AddonManager(mainPath: String) {
                         if (!pluginFolder.exists()) {
                             pluginFolder.mkdirs()
                         }
-                        val addon = mainClass.getConstructor().newInstance() as ModernAddon
+                        val addon = mainClass.getDeclaredConstructor().newInstance() as ModernAddon
                         addon.setData(AddonData(
                             Info(pluginName = addonConfig.name, pluginVersion = addonConfig.version),
                             Manager(addonDirectory = pluginFolder, urlClassLoader = classloader),
                             LoggerFactory.getLogger(mainClass)
                         ))
-                        logger.info("Addon ${addon.info.pluginName} version ${addon.info.pluginVersion} loaded")
+                        logger.info("Addon ${addon.info().pluginName} version ${addon.info().pluginVersion} loaded")
                         NativeAddonData(it, addon)
                     } catch (e: SerializationException) {
                         logger.error("Filed load addon.yml", e)
