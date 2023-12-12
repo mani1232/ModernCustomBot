@@ -4,27 +4,23 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
 }
 
-subprojects {
-
-    apply(plugin = "com.github.johnrengelman.shadow")
-    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-
-    group = "cc.worldmandia"
-    version = findProperty("version")!! as String
-
+allprojects {
     repositories {
         mavenCentral()
     }
 
-    dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0-RC")
-        implementation("com.charleskorn.kaml:kaml-jvm:0.56.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
-        implementation("net.dv8tion:JDA:5.0.0-beta.18")
-        implementation("ch.qos.logback:logback-classic:1.4.14")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+}
 
-        implementation(kotlin("reflect"))
+subprojects {
+
+    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+
+    group = "cc.worldmandia"
+    version = findProperty("version")!! as String
+
+    dependencies {
         testImplementation(kotlin("test"))
     }
 

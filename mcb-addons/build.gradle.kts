@@ -1,0 +1,10 @@
+subprojects {
+    dependencies {
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.0.0-Beta1")
+
+        // Other
+        compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
+        compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0-RC")
+        compileOnly(project(path = ":mcb-api", configuration = "shadow"))
+    }
+}

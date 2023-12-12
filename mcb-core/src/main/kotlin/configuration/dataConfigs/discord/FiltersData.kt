@@ -1,7 +1,7 @@
 package configuration.dataConfigs.discord
 
-import configuration.dataConfigs.Custom
-import configuration.dataConfigs.Filter
+import api.configuration.configType.Custom
+import api.configuration.configType.Filter
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.channel.ChannelType

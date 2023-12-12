@@ -12,3 +12,6 @@ plugins {
 rootProject.name = "ModernCustomBot"
 include("mcb-core")
 include("mcb-api")
+include("mcb-addons")
+include("mcb-addons:mcb-music")
+findProject(":mcb-addons:mcb-music")?.name = "mcb-music"

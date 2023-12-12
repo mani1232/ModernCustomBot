@@ -2,9 +2,11 @@ package configuration
 
 import api.configuration.ConfigFile
 import api.configuration.ConfigsDirectory
+import api.configuration.configType.Custom
+import api.discord.DiscordInteractionEnum
+import api.discord.dataConfigs.CustomDiscordConfig
 import configuration.dataConfigs.*
 import configuration.dataConfigs.discord.*
-import jda.DiscordInteractionEnum
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
@@ -94,7 +96,7 @@ class ConfigVault(path: String) {
     }
 
     suspend fun updateAllFiles() = coroutineScope {
-        mainConfig.updateFile(mainConfig.data.await().get())
+        mainConfig.updateFile(mainConfig.data.await()!!)
         customDiscordConfig.updateAllFiles()
     }
 }

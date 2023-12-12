@@ -1,7 +1,10 @@
 package jda
 
-import configuration.dataConfigs.Action
-import configuration.dataConfigs.Filter
+import api.configuration.configType.Action
+import api.configuration.configType.Filter
+import api.discord.DCustomAPI
+import api.discord.DiscordInteractionEnum
+import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import kotlin.reflect.KClass
@@ -10,21 +13,22 @@ import kotlin.reflect.KClass
 class DiscordListeners : ListenerAdapter() {
 
     override fun onGenericEvent(event: GenericEvent) {
-        val eventEnum = DiscordInteractionEnum.entries.parallelStream()
-            .filter { it.kType.classifier as KClass<GenericEvent> == event::class }.findFirst()
+        val eventEnum = DiscordInteractionEnum.entries.firstOrNull { it.kType.classifier as KClass<GenericEvent> == event::class }
 
-        if (eventEnum.isPresent) {
-            val customs = DCustomAPI.getSortedMap()[eventEnum.get()]
-            if (!customs.isNullOrEmpty()) {
-                customs.forEach { map ->
-                    map.value.forEach {
-                        if (it is Filter) {
-                            if (!it.isCan(event) == it.whitelist) {
-                                it.denyRun(event, eventEnum.get())
-                                return
+        if (eventEnum != null) {
+            runBlocking {
+                val customs = DCustomAPI.getBundle(eventEnum)
+                if (!customs.isNullOrEmpty()) {
+                    customs.forEach { map ->
+                        map.value.forEach {
+                            if (it is Filter) {
+                                if (!it.isCan(event) == it.whitelist) {
+                                    it.denyRun(event)
+                                    return@forEach
+                                }
+                            } else if (it is Action) {
+                                it.run(event)
                             }
-                        } else if (it is Action) {
-                            it.run(event)
                         }
                     }
                 }

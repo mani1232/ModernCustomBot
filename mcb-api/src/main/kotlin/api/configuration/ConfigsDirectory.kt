@@ -23,7 +23,7 @@ open class ConfigsDirectory<T : Any>(
     }
 
     suspend fun updateAllFiles() {
-        dirConfigFiles.forEach { it.updateFile(it.data.await().get()) }
+        dirConfigFiles.forEach { it.updateFile(it.data.await()!!) }
     }
 
 

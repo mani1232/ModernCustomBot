@@ -1,7 +1,7 @@
 package configuration.dataConfigs.discord
 
-import configuration.dataConfigs.Action
-import configuration.dataConfigs.Custom
+import api.configuration.configType.Action
+import api.configuration.configType.Custom
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.entities.emoji.Emoji
