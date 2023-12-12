@@ -1,6 +1,9 @@
 package configuration.dataConfigs
 
 import jda.DiscordListeners
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -27,19 +30,24 @@ data class DiscordBot(
     val intents: MutableList<GatewayIntent> = mutableListOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES)
 ) : Bot(), BotImpl<JDA> {
     @Transient
-    private var bot: JDA? = null
-    override fun init() {
+    private lateinit var bot: Deferred<JDA>
+    override suspend fun init() = coroutineScope {
         try {
-            bot = JDABuilder.createLight(token).enableIntents(intents).build()
-            bot!!.addEventListener(DiscordListeners())
-            LoggerFactory.getLogger(bot!!.selfUser.id).info("Bot `${bot!!.selfUser.name}` started!")
+            bot = async { JDABuilder.createLight(token).enableIntents(intents).build() }
+            bot.await().addEventListener(DiscordListeners())
+            LoggerFactory.getLogger(bot.await().selfUser.id).info("Bot `${bot.await().selfUser.name}` started!")
+            bot
         } catch (e: InvalidTokenException) {
             LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
         }
     }
 
-    override fun get(): JDA? {
+    override suspend fun get(): Deferred<JDA> {
         return bot
+    }
+
+    override suspend fun shutdown() {
+        bot.await().awaitShutdown()
     }
 
 }
@@ -47,17 +55,25 @@ data class DiscordBot(
 @SerialName("telegram")
 @Serializable
 data class TelegramBot(val token: String) : Bot(), BotImpl<Any> {
-    override fun init() {
-        return
+    override suspend fun init() = coroutineScope {
+
     }
 
-    override fun get(): Any {
-        return ""
+    override suspend fun get(): Deferred<Any> = coroutineScope {
+        async {
+            ""
+        }
+    }
+
+    override suspend fun shutdown() {
+
     }
 
 }
 
 interface BotImpl<T> {
-    fun init()
-    fun get(): T?
+    suspend fun init(): Any
+    suspend fun get(): Deferred<T>
+
+    suspend fun shutdown()
 }

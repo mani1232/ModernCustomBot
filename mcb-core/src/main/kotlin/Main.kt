@@ -6,7 +6,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import kotlin.concurrent.thread
 
 const val mainFolder = "CustomBot"
 
@@ -17,12 +16,8 @@ private val logger: Logger = LoggerFactory.getLogger("Main")
 
 fun main(args: Array<String>) = runBlocking {
     try {
-        logger.info("Loading configs")
-        configVault.loadAll()
+        logger.info("Starting ModernCustomBot...")
         startCustomBot()
-        logger.info("Loading addons")
-        addonManager.initAddons()
-        addonManager.enableAddons()
         logger.info("Done!")
     } catch (e: Exception) {
         logger.error(e.message, e)
@@ -30,13 +25,25 @@ fun main(args: Array<String>) = runBlocking {
 }
 
 suspend fun startCustomBot() = coroutineScope {
+    logger.info("Loading addons")
+    addonManager.initAddons()
+    addonManager.enableAddons()
+    logger.info("Loading configs")
+    configVault.loadAll()
     logger.info("Sorting configs")
     DCustomAPI.clear()
     DCustomAPI.sort(configVault.customDiscordConfig.dirConfigFiles)
     logger.info("Starting bots")
     configVault.mainConfig.data.await()?.bots?.forEach {
-        thread {
-            (it as BotImpl<*>).init()
-        }
+        (it as BotImpl<*>).init()
     }
+    Runtime.getRuntime().addShutdownHook(object : Thread() {
+        override fun run(): Unit = runBlocking {
+            logger.info("Shutdown bot manager")
+            addonManager.disableAddons()
+            configVault.mainConfig.data.await()?.bots?.forEach {
+                (it as BotImpl<*>).shutdown()
+            }
+        }
+    })
 }
