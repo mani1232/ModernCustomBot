@@ -10,3 +10,9 @@ subprojects {
         compileOnly(project(path = ":mcb-api", configuration = "shadow"))
     }
 }
+
+tasks {
+    shadowJar {
+        enabled = false
+    }
+}
