@@ -55,6 +55,32 @@ publishing {
             artifactId = "mcb-api"
             version = "${apiVersion}${if (development) "-dev" else ""}"
             from(components["kotlin"])
+            pom {
+                name.set(productName)
+                description.set("ModernCustomBot addon library")
+                url.set("https://github.com/mani1232/ModernCustomBot")
+
+                licenses {
+                    license {
+                        name.set("Apache")
+                        url.set("https://github.com/mani1232/ModernCustomBot/blob/master/LICENSE.md")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("mani123")
+                        name.set("Mykyta Secret")
+                        url.set("https://worldmandia.cc/")
+                    }
+                }
+
+                scm {
+                    url.set("https://github.com/mani1232/ModernCustomBot")
+                    connection.set("scm:git:git://github.com/mani1232/ModernCustomBot.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:mani1232/ModernCustomBot.git")
+                }
+            }
         }
     }
 }
