@@ -11,4 +11,10 @@ tasks {
     shadowJar {
         enabled = false
     }
+    jar {
+        enabled = false
+        subprojects.forEach {
+            dependsOn(it.tasks.build)
+        }
+    }
 }

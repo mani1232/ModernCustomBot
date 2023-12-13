@@ -8,7 +8,7 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
+    jar {
         archiveFileName = "$productName-$version-addon.jar"
     }
 }
