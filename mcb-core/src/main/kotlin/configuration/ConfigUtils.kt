@@ -1,9 +1,9 @@
 package configuration
 
 import addonManager
-import api.configuration.ConfigDefaults
 import api.configuration.ConfigFile
 import api.configuration.ConfigsDirectory
+import api.discord.DCustomAPI
 import api.discord.DiscordInteractionEnum
 import api.discord.dataConfigs.CustomDiscordConfig
 import configuration.dataConfigs.BotConfig
@@ -19,11 +19,17 @@ import kotlin.reflect.typeOf
 
 const val MainConfigName = "CustomConfig.yml"
 
-class ConfigVault(path: String) {
+class ConfigVault(private val path: String) {
+
+    lateinit var mainConfig: ConfigFile<BotConfig>
+    lateinit var customDiscordConfig: ConfigsDirectory<CustomDiscordConfig>
 
     init {
         File(path).mkdirs()
-        ConfigDefaults.registerCustoms(
+    }
+
+    suspend fun initData() {
+        DCustomAPI.registerCustoms(
             listOf(
                 typeOf<SendText>(),
                 typeOf<BotFilter>(),
@@ -34,11 +40,10 @@ class ConfigVault(path: String) {
                 typeOf<InteractionFilter>(),
             )
         )
+        mainConfig = ConfigFile.create(File(path, MainConfigName), SerializersModule { })
+        customDiscordConfig = ConfigsDirectory.create(File(path, "custom/"), DCustomAPI.getCustomsModule())
     }
 
-    val mainConfig: ConfigFile<BotConfig> = ConfigFile.create(File(path, MainConfigName), SerializersModule { })
-    val customDiscordConfig: ConfigsDirectory<CustomDiscordConfig> =
-        ConfigsDirectory.create(File(path, "custom/"), ConfigDefaults.getCustomsModule())
 
     suspend fun loadAll() {
         mainConfig.loadDefaultFile(BotConfig(mutableListOf(DiscordBot("ENTER_IT_HERE"), TelegramBot("TODO"))))

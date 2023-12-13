@@ -60,9 +60,14 @@ data class SendText(
     val text: String = "EMPTY_TEXT",
     val reply: Boolean = false,
     val ephemeral: Boolean = false,
+    val fromBot: Boolean = false,
     val actionRows: List<List<ComponentConfig>>? = mutableListOf()
 ) : Custom(), Action {
     override fun run(event: GenericEvent) {
+        if (event is MessageReceivedEvent && event.message.author.isBot || fromBot) {
+            return
+        }
+
         val components = mutableListOf<LayoutComponent>()
         if (!actionRows.isNullOrEmpty()) {
             actionRows.forEach {
@@ -86,7 +91,7 @@ data class SendText(
 }
 
 @Serializable
-sealed class ComponentConfig: ComponentImpl()
+sealed class ComponentConfig : ComponentImpl()
 
 @Serializable
 @SerialName("button")

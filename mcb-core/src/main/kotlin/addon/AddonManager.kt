@@ -5,9 +5,7 @@ import api.addon.Info
 import api.addon.Manager
 import api.addon.ModernAddon
 import api.configuration.ConfigDefaults
-import api.configuration.ConfigFile
 import com.charleskorn.kaml.decodeFromStream
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -37,19 +35,22 @@ class AddonManager(mainPath: String) {
                 val addonConfigStream = classloader.getResourceAsStream("addon.yml")
                 if (addonConfigStream != null) {
                     try {
-                        val addonConfig = ConfigDefaults.getConfiguredYaml(SerializersModule {  }).decodeFromStream<AddonConfigData>(addonConfigStream)
+                        val addonConfig = ConfigDefaults.getConfiguredYaml(SerializersModule { })
+                            .decodeFromStream<AddonConfigData>(addonConfigStream)
                         val mainClass = classloader.loadClass(addonConfig.main)
                         val pluginFolder = File(folder, "/${addonConfig.name}")
                         if (!pluginFolder.exists()) {
                             pluginFolder.mkdirs()
                         }
                         val addon = mainClass.getDeclaredConstructor().newInstance() as ModernAddon
-                        addon.setData(AddonData(
-                            Info(pluginName = addonConfig.name, pluginVersion = addonConfig.version),
-                            Manager(addonDirectory = pluginFolder, urlClassLoader = classloader),
-                            LoggerFactory.getLogger(mainClass)
-                        ))
-                        logger.info("Addon ${addon.info().pluginName} version ${addon.info().pluginVersion} loaded")
+                        addon.initDefaultValue(
+                            AddonData(
+                                Info(pluginName = addonConfig.name, pluginVersion = addonConfig.version),
+                                Manager(addonDirectory = pluginFolder, urlClassLoader = classloader),
+                                LoggerFactory.getLogger(mainClass)
+                            )
+                        )
+                        logger.info("Addon ${addon.info.pluginName} version ${addon.info.pluginVersion} loaded")
                         NativeAddonData(it, addon)
                     } catch (e: SerializationException) {
                         logger.error("Filed load addon.yml", e)

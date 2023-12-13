@@ -13,7 +13,8 @@ import kotlin.reflect.KClass
 class DiscordListeners : ListenerAdapter() {
 
     override fun onGenericEvent(event: GenericEvent) {
-        val eventEnum = DiscordInteractionEnum.entries.firstOrNull { it.kType.classifier as KClass<GenericEvent> == event::class }
+        val eventEnum =
+            DiscordInteractionEnum.entries.firstOrNull { it.kType.classifier as KClass<GenericEvent> == event::class }
 
         if (eventEnum != null) {
             runBlocking {

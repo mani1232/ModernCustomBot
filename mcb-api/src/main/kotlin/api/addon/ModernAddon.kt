@@ -1,6 +1,7 @@
 package api.addon
 
 import api.configuration.ConfigFile
+import api.discord.DCustomAPI
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import java.io.File
@@ -9,31 +10,28 @@ abstract class ModernAddon {
 
     private lateinit var data: AddonData
 
-   // val manager = data.manager
-   // val info = data.info
-   // val log = data.logger
+    lateinit var manager: Manager
 
-    fun manager(): Manager {
-        return data.manager
-    }
+    lateinit var info: Info
 
-    fun info(): Info {
-        return data.info
-    }
+    lateinit var logger: Logger
 
-    fun logger(): Logger {
-        return data.logger
-    }
+    lateinit var api: DCustomAPI
+
     abstract suspend fun enableAddon()
     abstract suspend fun disableAddon()
     abstract suspend fun reloadAddon()
 
     inline fun <reified T> getDefaultConfig(): ConfigFile<T> {
-        return ConfigFile.create<T>(File(manager().addonDirectory, "/${info().pluginName}.yml"), SerializersModule { })
+        return ConfigFile.create<T>(File(manager.addonDirectory, "/${info.pluginName}.yml"), SerializersModule { })
     }
 
-    fun setData(data: AddonData) {
+    fun initDefaultValue(data: AddonData) {
         this.data = data
+        this.api = DCustomAPI(data)
+        this.manager = data.manager
+        this.info = data.info
+        this.logger = data.logger
     }
 
 }

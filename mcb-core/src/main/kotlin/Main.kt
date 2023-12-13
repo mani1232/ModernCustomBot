@@ -29,6 +29,7 @@ suspend fun startCustomBot() = coroutineScope {
     addonManager.initAddons()
     addonManager.enableAddons()
     logger.info("Loading configs")
+    configVault.initData()
     configVault.loadAll()
     logger.info("Sorting configs")
     DCustomAPI.clear()
