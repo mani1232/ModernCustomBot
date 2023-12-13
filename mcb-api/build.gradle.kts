@@ -8,13 +8,13 @@ val productName = findProperty("product-name")!! as String
 val development = parseBoolean(findProperty("development")!! as String)
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0-RC")
-    implementation("com.charleskorn.kaml:kaml-jvm:0.56.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
-    implementation("net.dv8tion:JDA:5.0.0-beta.18")
-    implementation("ch.qos.logback:logback-classic:1.4.14")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0-RC")
+    api("com.charleskorn.kaml:kaml-jvm:0.56.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
+    api("net.dv8tion:JDA:5.0.0-beta.18")
+    api("ch.qos.logback:logback-classic:1.4.14")
 
-    implementation(kotlin("reflect"))
+    compileOnly(kotlin("reflect"))
 }
 
 tasks {
@@ -35,14 +35,6 @@ publishing {
                 }
             }
         }
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = "cc.worldmandia"
-                artifactId = "mcb-api"
-                version = project.version.toString()
-                from(components["java"])
-            }
-        }
     } else {
         repositories {
             maven {
@@ -54,13 +46,15 @@ publishing {
                 }
             }
         }
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = "cc.worldmandia"
-                artifactId = "mcb-api"
-                version = "${project.version}-dev"
-                from(components["java"])
-            }
+    }
+
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "cc.worldmandia"
+            artifactId = "mcb-api"
+            version = "${project.version}${if (development) "-dev" else ""}"
+            println(components.map { it.name })
+            from(components["kotlin"])
         }
     }
 }

@@ -7,6 +7,7 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
+        maven("https://repo.worldmandia.cc/releases/")
     }
 
     apply(plugin = "org.jetbrains.kotlin.jvm")
