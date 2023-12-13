@@ -53,7 +53,6 @@ publishing {
             groupId = "cc.worldmandia"
             artifactId = "mcb-api"
             version = "${project.version}${if (development) "-dev" else ""}"
-            println(components.map { it.name })
             from(components["kotlin"])
         }
     }
