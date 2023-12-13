@@ -11,6 +11,16 @@ allprojects {
     }
 
     apply(plugin = "org.jetbrains.kotlin.jvm")
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 subprojects {
@@ -29,9 +39,5 @@ subprojects {
         test {
             useJUnitPlatform()
         }
-    }
-
-    kotlin {
-        jvmToolchain(17)
     }
 }
