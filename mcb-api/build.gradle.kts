@@ -4,6 +4,7 @@ plugins {
     `maven-publish`
 }
 
+val apiVersion = findProperty("api-version")!! as String
 val productName = findProperty("product-name")!! as String
 val development = parseBoolean(findProperty("development")!! as String)
 
@@ -52,7 +53,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "cc.worldmandia"
             artifactId = "mcb-api"
-            version = "${project.version}${if (development) "-dev" else ""}"
+            version = "${apiVersion}${if (development) "-dev" else ""}"
             from(components["kotlin"])
         }
     }
