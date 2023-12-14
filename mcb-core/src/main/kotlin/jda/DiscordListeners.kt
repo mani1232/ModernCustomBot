@@ -7,6 +7,7 @@ import api.discord.DiscordInteractionEnum
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 
 
@@ -25,6 +26,7 @@ class DiscordListeners : ListenerAdapter() {
                     customs.forEach { map ->
                         map.value.forEach {
                             it.tempData = tempData
+                            it.logger = LoggerFactory.getLogger("${map.key}-${it::class.simpleName}")
                             if (it is Filter) {
                                 if (!it.isCan(event) == it.whitelist) {
                                     it.denyRun(event)

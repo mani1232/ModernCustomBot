@@ -1,5 +1,7 @@
 package configuration.dataConfigs
 
+import api.addon.AddonManager
+import api.configuration.BotImpl
 import jda.DiscordListeners
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -30,24 +32,33 @@ data class DiscordBot(
     val intents: MutableList<GatewayIntent> = mutableListOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES)
 ) : Bot(), BotImpl<JDA> {
     @Transient
-    private lateinit var bot: Deferred<JDA>
-    override suspend fun init() = coroutineScope {
+    private lateinit var bot: Deferred<JDA?>
+    override suspend fun init(addonManager: AddonManager) = coroutineScope {
         try {
-            bot = async { JDABuilder.createLight(token).enableIntents(intents).build() }
-            bot.await().addEventListener(DiscordListeners())
-            LoggerFactory.getLogger(bot.await().selfUser.id).info("Bot `${bot.await().selfUser.name}` started!")
+            bot = async {
+                val builder = addonManager.botBuilder(token, JDABuilder.createLight(token).enableIntents(intents))
+                if (builder is JDABuilder) {
+                    val jda = builder.addEventListeners(DiscordListeners()).build().awaitReady()
+                    LoggerFactory.getLogger(jda.selfUser.id).info("Bot `${jda.selfUser.name}` started!")
+                    jda
+                } else {
+                    null
+                }
+            }
             bot
         } catch (e: InvalidTokenException) {
             LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
         }
     }
 
-    override suspend fun get(): Deferred<JDA> {
+    override suspend fun get(): Deferred<JDA?> {
         return bot
     }
 
     override suspend fun shutdown() {
-        bot.await().awaitShutdown()
+        if (bot.await() != null) {
+            bot.await()!!.awaitShutdown()
+        }
     }
 
 }
@@ -55,7 +66,7 @@ data class DiscordBot(
 @SerialName("telegram")
 @Serializable
 data class TelegramBot(val token: String) : Bot(), BotImpl<Any> {
-    override suspend fun init() = coroutineScope {
+    override suspend fun init(addonManager: AddonManager) = coroutineScope {
 
     }
 
@@ -69,11 +80,4 @@ data class TelegramBot(val token: String) : Bot(), BotImpl<Any> {
 
     }
 
-}
-
-interface BotImpl<T> {
-    suspend fun init(): Any
-    suspend fun get(): Deferred<T>
-
-    suspend fun shutdown()
 }

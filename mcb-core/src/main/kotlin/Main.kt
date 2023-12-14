@@ -1,7 +1,7 @@
-import addon.AddonManager
+import api.addon.AddonManager
+import api.configuration.BotImpl
 import api.discord.DCustomAPI
 import configuration.ConfigVault
-import configuration.dataConfigs.BotImpl
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
@@ -36,7 +36,7 @@ suspend fun startCustomBot() = coroutineScope {
     DCustomAPI.sort(configVault.customDiscordConfig.dirConfigFiles)
     logger.info("Starting bots")
     configVault.mainConfig.data.await()?.bots?.forEach {
-        (it as BotImpl<*>).init()
+        (it as BotImpl<*>).init(addonManager)
     }
     Runtime.getRuntime().addShutdownHook(object : Thread() {
         override fun run(): Unit = runBlocking {

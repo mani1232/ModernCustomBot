@@ -4,9 +4,12 @@ import api.configuration.configType.Action
 import api.configuration.configType.Custom
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.GenericEvent
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
@@ -107,6 +110,76 @@ data class ButtonConfig(
         } else {
             Button.of(buttonStyle, idOrUrl, label, Emoji.fromFormatted(emoji))
         }
+    }
+}
+
+@Serializable
+@SerialName("connectVoiceChannel")
+data class ConnectVoiceChannel(
+    val idOfVoiceChannelData: String
+) : Custom(), Action {
+    override fun run(event: GenericEvent) {
+        val channel = tempData[idOfVoiceChannelData]
+
+        if (channel == null || channel !is VoiceChannel) {
+            logger.warn("$idOfVoiceChannelData is not found or not VoiceChannel")
+            return
+        }
+
+        event.jda.directAudioController.connect(channel)
+    }
+}
+
+@Serializable
+@SerialName("addCommandOptions")
+data class AddCommandOptions(
+    val resetTempData: Boolean = false
+) : Custom(), Action {
+    override fun run(event: GenericEvent) {
+        if (resetTempData) {
+            tempData.clear()
+        }
+
+        if (event is GenericCommandInteractionEvent) {
+            event.options.forEach {
+                tempData[it.name] = when (it.type) {
+                    OptionType.UNKNOWN -> "empty"
+                    OptionType.SUB_COMMAND -> it.asString
+                    OptionType.SUB_COMMAND_GROUP -> it.asString
+                    OptionType.STRING -> it.asString
+                    OptionType.INTEGER -> it.asInt
+                    OptionType.BOOLEAN -> it.asBoolean
+                    OptionType.USER -> it.asUser
+                    OptionType.CHANNEL -> it.asChannel
+                    OptionType.ROLE -> it.asRole
+                    OptionType.MENTIONABLE -> it.asMentionable
+                    OptionType.NUMBER -> it.asDouble
+                    OptionType.ATTACHMENT -> it.asAttachment
+                }
+            }
+        }
+    }
+}
+
+@Serializable
+@SerialName("disconnectVoiceChannel")
+data class DisconnectVoiceChannel(
+    val idOfVoiceChannelData: String
+) : Custom(), Action {
+    override fun run(event: GenericEvent) {
+        val channel = tempData[idOfVoiceChannelData]
+
+        if (channel == null || channel !is VoiceChannel) {
+            logger.warn("$idOfVoiceChannelData is not found or not VoiceChannel")
+            return
+        }
+
+        if (event !is GenericGuildEvent) {
+            logger.warn("$idOfVoiceChannelData is not found or not VoiceChannel")
+            return
+        }
+
+        event.jda.directAudioController.disconnect(event.guild)
     }
 }
 

@@ -1,9 +1,5 @@
-package addon
+package api.addon
 
-import api.addon.AddonData
-import api.addon.Info
-import api.addon.Manager
-import api.addon.ModernAddon
 import api.configuration.ConfigDefaults
 import com.charleskorn.kaml.decodeFromStream
 import kotlinx.coroutines.async
@@ -76,6 +72,12 @@ class AddonManager(mainPath: String) {
 
     suspend fun reloadAddons() = coroutineScope {
         plugins.forEach { it.addon.enableAddon() }
+    }
+
+    suspend fun botBuilder(token: String, botBuilder: Any): Any {
+        var tempBotBuilder = botBuilder
+        plugins.forEach { tempBotBuilder = it.addon.botBuilder(token, tempBotBuilder) }
+        return tempBotBuilder
     }
 
 }

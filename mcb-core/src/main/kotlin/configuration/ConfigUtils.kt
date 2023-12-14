@@ -38,6 +38,9 @@ class ConfigVault(private val path: String) {
                 typeOf<RegisterCommand>(),
                 typeOf<DeleteCommand>(),
                 typeOf<InteractionFilter>(),
+                typeOf<ConnectVoiceChannel>(),
+                typeOf<DisconnectVoiceChannel>(),
+                typeOf<AddCommandOptions>(),
             )
         )
         mainConfig = ConfigFile.create(File(path, MainConfigName), SerializersModule { })

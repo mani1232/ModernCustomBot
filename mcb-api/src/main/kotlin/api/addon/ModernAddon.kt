@@ -2,6 +2,7 @@ package api.addon
 
 import api.configuration.ConfigFile
 import api.discord.DCustomAPI
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import java.io.File
@@ -20,7 +21,13 @@ abstract class ModernAddon {
 
     abstract suspend fun enableAddon()
     abstract suspend fun disableAddon()
-    abstract suspend fun reloadAddon()
+    open suspend fun reloadAddon() {
+        disableAddon()
+        enableAddon()
+    }
+    open suspend fun botBuilder(token: String, botBuilder: Any): Any {
+        return botBuilder
+    }
 
     inline fun <reified T> getDefaultConfig(): ConfigFile<T> {
         return ConfigFile.create<T>(File(manager.addonDirectory, "/${info.pluginName}.yml"), SerializersModule { })
