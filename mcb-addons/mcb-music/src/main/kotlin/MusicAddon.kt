@@ -1,7 +1,6 @@
 import api.addon.ModernAddon
 import api.configuration.configType.Action
 import api.configuration.configType.Custom
-import dev.arbjerg.lavalink.client.AbstractAudioLoadResultHandler
 import dev.arbjerg.lavalink.client.LavalinkClient
 import dev.arbjerg.lavalink.client.getUserIdFromToken
 import dev.arbjerg.lavalink.client.loadbalancing.IRegionFilter
@@ -12,7 +11,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent
 import java.net.URI
@@ -30,7 +28,7 @@ class MusicAddon : ModernAddon() {
     override suspend fun enableAddon(): Unit = coroutineScope {
         instance = this@MusicAddon
         musicConfig.loadDefaultFile(MusicAddonConfig(nodes = mutableListOf(LavaLinkNodeConfig())))
-                .await()
+            .await()
         if (musicConfig.data.await() != null) {
             api.registerAddonCustoms(
                 typeOf<StartPlayUrl>(),
@@ -41,12 +39,18 @@ class MusicAddon : ModernAddon() {
     }
 
     override suspend fun disableAddon() {
-        lavaLinkClientsMap.forEach { (id, client) ->
-            client.nodes.forEach { it.getPlayers().subscribe { playerList -> playerList.forEach { player -> it.updatePlayer(player.guildId) { update ->
-                update.setEncodedTrack(
-                    null
-                ).setPaused(false)
-            }.subscribe {  } } } }
+        lavaLinkClientsMap.forEach { (_, client) ->
+            client.nodes.forEach {
+                it.getPlayers().subscribe { playerList ->
+                    playerList.forEach { player ->
+                        it.updatePlayer(player.guildId) { update ->
+                            update.setEncodedTrack(
+                                null
+                            ).setPaused(false)
+                        }.subscribe { }
+                    }
+                }
+            }
         }
         lavaLinkClientsMap.clear()
         logger.info("Addon disabled, for add other bots you need full reload ModernCustomBot!")

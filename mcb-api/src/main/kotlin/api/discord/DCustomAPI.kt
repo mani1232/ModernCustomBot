@@ -38,7 +38,7 @@ class DCustomAPI() {
 
         private val customsTypesList = Collections.synchronizedList(mutableListOf<KType>())
         private val sortedMap =
-            Collections.synchronizedMap(mutableMapOf<DiscordInteractionEnum, Deferred<MutableMap<String, MutableList<Custom>>>>())
+            Collections.synchronizedMap(mutableMapOf<DiscordInteraction, Deferred<MutableMap<String, MutableList<Custom>>>>())
         private lateinit var customsModule: Deferred<SerializersModule>
 
         suspend fun registerCustoms(list: List<KType>) = coroutineScope {
@@ -70,7 +70,7 @@ class DCustomAPI() {
                                     val annotation =
                                         kclass.annotations.firstOrNull { annotation -> annotation.annotationClass == SerialName::class }
 
-                                    if (kclass.annotations.firstOrNull { annotation -> annotation.annotationClass == Serializable::class } == null) {
+                                    if (kclass.annotations.firstOrNull { annotationSerializable -> annotationSerializable.annotationClass == Serializable::class } == null) {
                                         data.logger.error("Annotation @Serializable for ${kclass.simpleName} class not found, contact to developer")
                                         return@forEach
                                     }
@@ -102,8 +102,9 @@ class DCustomAPI() {
             return customsModule.await()
         }
 
-        fun clear() {
+        fun clearAll() {
             sortedMap.clear()
+            customsTypesList.clear()
         }
 
         suspend fun sort(configs: MutableList<ConfigFile<CustomDiscordConfig>>) = coroutineScope {

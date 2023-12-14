@@ -2,7 +2,6 @@ package api.addon
 
 import api.configuration.ConfigFile
 import api.discord.DCustomAPI
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import java.io.File
@@ -25,6 +24,7 @@ abstract class ModernAddon {
         disableAddon()
         enableAddon()
     }
+
     open suspend fun botBuilder(token: String, botBuilder: Any): Any {
         return botBuilder
     }

@@ -23,12 +23,15 @@ class AudioLoadResultHandler(private val addon: MusicAddon, private val link: Li
             }
         }
     }
+
     override fun onSearchResultLoaded(result: SearchResult) {
         addon.logger.warn("Search result feature not supported")
     }
+
     override fun noMatches() {
         // TODO add listener
     }
+
     override fun loadFailed(result: LoadFailed) {
         // TODO add listener
     }

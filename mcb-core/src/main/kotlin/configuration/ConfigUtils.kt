@@ -10,7 +10,6 @@ import configuration.dataConfigs.BotConfig
 import configuration.dataConfigs.DiscordBot
 import configuration.dataConfigs.TelegramBot
 import configuration.dataConfigs.discord.*
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.modules.SerializersModule
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
@@ -92,7 +91,7 @@ class ConfigVault(private val path: String) {
         addonManager.reloadAddons()
     }
 
-    suspend fun updateAllFiles() = coroutineScope {
+    suspend fun updateAllFiles() {
         mainConfig.updateFile(mainConfig.data.await()!!)
         customDiscordConfig.updateAllFiles()
     }
