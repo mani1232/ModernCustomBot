@@ -10,6 +10,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
@@ -68,6 +69,12 @@ class DCustomAPI() {
                                     val kclass = it.classifier as KClass<Custom>
                                     val annotation =
                                         kclass.annotations.firstOrNull { annotation -> annotation.annotationClass == SerialName::class }
+
+                                    if (kclass.annotations.firstOrNull { annotation -> annotation.annotationClass == Serializable::class } == null) {
+                                        data.logger.error("Annotation @Serializable for ${kclass.simpleName} class not found, contact to developer")
+                                        return@forEach
+                                    }
+
                                     if (annotation == null) {
                                         data.logger.error("Annotation @SerialName(name: String) for ${kclass.simpleName} class not found, contact to developer")
                                         return@forEach
