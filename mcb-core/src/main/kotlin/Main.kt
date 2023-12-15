@@ -3,6 +3,7 @@ import api.configuration.BotImpl
 import api.discord.DCustomAPI
 import configuration.ConfigVault
 import console.ConsoleCommandProcessor
+import jda.DiscordInteractionEnum
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
@@ -33,6 +34,7 @@ suspend fun startCustomBot() = coroutineScope {
     configVault.initData()
     configVault.loadAll()
     logger.info("Sorting configs")
+    DCustomAPI.registerInteraction(DiscordInteractionEnum.entries.map { it.name })
     DCustomAPI.sort(configVault.customDiscordConfig.dirConfigFiles)
     logger.info("Starting bots")
     configVault.mainConfig.data.await()?.bots?.forEach {

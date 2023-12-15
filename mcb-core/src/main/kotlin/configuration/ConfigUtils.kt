@@ -4,19 +4,19 @@ import addonManager
 import api.configuration.ConfigFile
 import api.configuration.ConfigsDirectory
 import api.discord.DCustomAPI
-import api.discord.DiscordInteractionEnum
 import api.discord.dataConfigs.CustomDiscordConfig
 import configuration.dataConfigs.BotConfig
 import configuration.dataConfigs.DiscordBot
 import configuration.dataConfigs.TelegramBot
 import configuration.dataConfigs.discord.*
+import jda.DiscordInteractionEnum
 import kotlinx.serialization.modules.SerializersModule
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 import java.io.File
 import kotlin.reflect.typeOf
 
-const val MainConfigName = "CustomConfig.yml"
+const val MainConfigName = "customConfig.yml"
 
 class ConfigVault(private val path: String) {
 
@@ -52,7 +52,7 @@ class ConfigVault(private val path: String) {
         customDiscordConfig.loadDefaultFiles(
             mutableMapOf(
                 "PingPongExample.yml" to CustomDiscordConfig(
-                    DiscordInteractionEnum.ON_MESSAGE_RECEIVE, mutableMapOf(
+                    DiscordInteractionEnum.ON_MESSAGE_RECEIVE.name, mutableMapOf(
                         "pingPong" to mutableListOf(
                             MessageFilter(
                                 onlyChannel = mutableListOf(ChannelType.PRIVATE),
@@ -70,10 +70,10 @@ class ConfigVault(private val path: String) {
                         )
                     )
                 ), "RegisterCommands.yml" to CustomDiscordConfig(
-                    DiscordInteractionEnum.ON_READY,
+                    DiscordInteractionEnum.ON_READY.name,
                     mutableMapOf("helpCommand" to mutableListOf(RegisterCommand("help", "send help info")))
                 ), "ProcessCommands.yml" to CustomDiscordConfig(
-                    DiscordInteractionEnum.ON_COMMAND, mutableMapOf(
+                    DiscordInteractionEnum.ON_COMMAND.name, mutableMapOf(
                         "helpCommandCheck" to mutableListOf(
                             InteractionFilter(
                                 mutableListOf("help"), whitelist = true

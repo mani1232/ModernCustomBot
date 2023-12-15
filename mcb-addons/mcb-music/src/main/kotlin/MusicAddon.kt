@@ -30,6 +30,7 @@ class MusicAddon : ModernAddon() {
         musicConfig.loadDefaultFile(MusicAddonConfig(nodes = mutableListOf(LavaLinkNodeConfig())))
             .await()
         if (musicConfig.data.await() != null) {
+            api.registerAddonInteraction(MusicAddonInteractions.entries.map { it.name })
             api.registerAddonCustoms(
                 typeOf<StartPlayUrl>(),
                 typeOf<PauseTrack>(),
@@ -72,6 +73,13 @@ class MusicAddon : ModernAddon() {
         }
     }
 
+}
+
+enum class MusicAddonInteractions {
+    NO_MATCHES,
+    LOAD_FAILED,
+    PLAYLIST_LOADED,
+    TRACK_LOADED,
 }
 
 @Serializable
@@ -119,7 +127,7 @@ data class StartPlayUrl(
         }
 
         val link = client.getLink(event.guild.idLong)
-        link.loadItem(idOfStringData).subscribe(AudioLoadResultHandler(MusicAddon.instance, link))
+        link.loadItem(idOfStringData).subscribe(AudioLoadResultListener(MusicAddon.instance, link, event))
     }
 }
 

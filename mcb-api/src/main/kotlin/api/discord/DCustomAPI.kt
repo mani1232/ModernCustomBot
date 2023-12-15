@@ -2,7 +2,9 @@ package api.discord
 
 import api.addon.AddonData
 import api.configuration.ConfigFile
+import api.configuration.configType.Action
 import api.configuration.configType.Custom
+import api.configuration.configType.Filter
 import api.discord.dataConfigs.CustomDiscordConfig
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -14,6 +16,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
+import net.dv8tion.jda.api.events.GenericEvent
+import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -30,15 +34,23 @@ class DCustomAPI() {
         registerAddonCustoms(type.toList(), pluginData)
     }
 
+    suspend fun registerAddonInteraction(name: String) {
+        registerInteraction(listOf("${pluginData.info.pluginName}_${name}"))
+    }
+
+    suspend fun registerAddonInteraction(names: List<String>) {
+        registerInteraction(names.map { "${pluginData.info.pluginName}_${it}" })
+    }
+
     suspend fun registerAddonCustoms(types: List<KType>) {
         registerAddonCustoms(types, pluginData)
     }
 
     companion object {
-
+        private val availableInteractionNames = Collections.synchronizedList(mutableListOf<String>())
         private val customsTypesList = Collections.synchronizedList(mutableListOf<KType>())
         private val sortedMap =
-            Collections.synchronizedMap(mutableMapOf<DiscordInteraction, Deferred<MutableMap<String, MutableList<Custom>>>>())
+            Collections.synchronizedMap(mutableMapOf<String, Deferred<MutableMap<String, MutableList<Custom>>>>())
         private lateinit var customsModule: Deferred<SerializersModule>
 
         suspend fun registerCustoms(list: List<KType>) = coroutineScope {
@@ -56,6 +68,10 @@ class DCustomAPI() {
                     }
                 }
             }
+        }
+
+        fun registerInteraction(names: List<String>) {
+            availableInteractionNames.addAll(names)
         }
 
         suspend fun registerAddonCustoms(list: List<KType>, data: AddonData) = coroutineScope {
@@ -107,8 +123,37 @@ class DCustomAPI() {
             customsTypesList.clear()
         }
 
+        suspend fun runCustoms(eventEnum: String, event: GenericEvent) {
+            var tempData = mutableMapOf<String, Any>()
+
+            val customs = getBundle(eventEnum)
+            if (!customs.isNullOrEmpty()) {
+                customs.forEach { map ->
+                    map.value.forEach {
+                        it.tempData = tempData
+                        it.logger = LoggerFactory.getLogger("${map.key}-${it::class.simpleName}")
+                        if (it is Filter) {
+                            if (!it.isCan(event) == it.whitelist) {
+                                it.denyRun(event, eventEnum)
+                                return@forEach
+                            }
+                        } else if (it is Action) {
+                            it.run(event)
+                        }
+                        tempData = it.tempData
+                    }
+                }
+            }
+        }
+
         suspend fun sort(configs: MutableList<ConfigFile<CustomDiscordConfig>>) = coroutineScope {
+            val log = LoggerFactory.getLogger("Sort-System")
             configs.mapNotNull { it.data.await() }.forEach {
+                if (!availableInteractionNames.contains(it.interactionType)) {
+                    log.warn("${it.interactionType} not registered and skipped")
+                    return@forEach
+                }
+
                 if (sortedMap.containsKey(it.interactionType) && sortedMap[it.interactionType] != null) {
                     it.custom.forEach { (id, value) ->
                         sortedMap[it.interactionType]!!.await().getOrPut(id) {
@@ -121,11 +166,11 @@ class DCustomAPI() {
             }
         }
 
-        suspend fun replaceBundle(interaction: DiscordInteractionEnum, bundleId: String, customs: MutableList<Custom>) {
+        suspend fun replaceBundle(interaction: String, bundleId: String, customs: MutableList<Custom>) {
             sortedMap[interaction]?.await()?.replace(bundleId, customs)
         }
 
-        suspend fun getBundle(interaction: DiscordInteractionEnum): Map<String, List<Custom>>? {
+        suspend fun getBundle(interaction: String): Map<String, List<Custom>>? {
             return sortedMap.getOrDefault(interaction, null)?.await()
         }
     }
