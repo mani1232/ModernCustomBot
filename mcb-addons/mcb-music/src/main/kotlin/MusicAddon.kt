@@ -1,3 +1,4 @@
+import api.addon.AddonData
 import api.addon.ModernAddon
 import api.configuration.configType.Action
 import api.configuration.configType.Custom
@@ -17,7 +18,7 @@ import java.net.URI
 import kotlin.reflect.typeOf
 
 
-class MusicAddon : ModernAddon() {
+class MusicAddon(data: AddonData) : ModernAddon(data) {
 
     companion object {
         val lavaLinkClientsMap = mutableMapOf<Long, LavalinkClient>()
@@ -25,6 +26,8 @@ class MusicAddon : ModernAddon() {
     }
 
     val musicConfig = getDefaultConfig<MusicAddonConfig>()
+
+
     override suspend fun enableAddon(): Unit = coroutineScope {
         instance = this@MusicAddon
         musicConfig.loadDefaultFile(MusicAddonConfig(nodes = mutableListOf(LavaLinkNodeConfig())))
@@ -37,6 +40,11 @@ class MusicAddon : ModernAddon() {
             )
             logger.info("Addon enabled!")
         }
+    }
+
+    override suspend fun reloadAddon() {
+        logger.info("Addon reloaded, for add other bots you need full reload ModernCustomBot!")
+        super.reloadAddon()
     }
 
     override suspend fun disableAddon() {
@@ -54,7 +62,7 @@ class MusicAddon : ModernAddon() {
             }
         }
         lavaLinkClientsMap.clear()
-        logger.info("Addon disabled, for add other bots you need full reload ModernCustomBot!")
+        logger.info("Addon disabled")
     }
 
     override suspend fun botBuilder(token: String, botBuilder: Any): Any {
@@ -75,6 +83,7 @@ class MusicAddon : ModernAddon() {
 
 }
 
+//@AddonInteraction
 enum class MusicAddonInteractions {
     NO_MATCHES,
     LOAD_FAILED,

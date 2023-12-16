@@ -38,14 +38,13 @@ class AddonManager(mainPath: String) {
                         if (!pluginFolder.exists()) {
                             pluginFolder.mkdirs()
                         }
-                        val addon = mainClass.getDeclaredConstructor().newInstance() as ModernAddon
-                        addon.initDefaultValue(
-                            AddonData(
-                                Info(pluginName = addonConfig.name, pluginVersion = addonConfig.version),
-                                Manager(addonDirectory = pluginFolder, urlClassLoader = classloader),
-                                LoggerFactory.getLogger(mainClass)
-                            )
-                        )
+
+                        val addon = mainClass.getDeclaredConstructor(AddonData::class.java).newInstance(AddonData(
+                            Info(pluginName = addonConfig.name, pluginVersion = addonConfig.version),
+                            Manager(addonDirectory = pluginFolder, urlClassLoader = classloader),
+                            LoggerFactory.getLogger(mainClass)
+                        )) as ModernAddon
+
                         logger.info("Addon ${addon.info.pluginName} version ${addon.info.pluginVersion} loaded")
                         NativeAddonData(it, addon)
                     } catch (e: SerializationException) {
