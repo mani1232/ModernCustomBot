@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.arbjerg:lavalink-client:64f8b44e8164f5873ab107f453b58b1a99a8bc13-SNAPSHOT") {
+    implementation("dev.arbjerg:lavalink-client:2.0.0") {
         exclude(group = "org.jetbrains.kotlin")
     }
 }

@@ -16,7 +16,7 @@ val addonManager = AddonManager(mainFolder)
 
 private val logger: Logger = LoggerFactory.getLogger("Main")
 
-fun main(args: Array<String>) = runBlocking {
+fun main() = runBlocking {
     try {
         logger.info("Starting ModernCustomBot...")
         startCustomBot()

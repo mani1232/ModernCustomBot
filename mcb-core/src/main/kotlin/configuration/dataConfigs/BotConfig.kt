@@ -34,8 +34,8 @@ data class DiscordBot(
     @Transient
     private lateinit var bot: Deferred<JDA?>
     override suspend fun init(addonManager: AddonManager) = coroutineScope {
-        try {
-            bot = async {
+        bot = async {
+            try {
                 val builder = addonManager.botBuilder(token, JDABuilder.createLight(token).enableIntents(intents))
                 if (builder is JDABuilder) {
                     val jda = builder.addEventListeners(DiscordListeners()).build().awaitReady()
@@ -44,10 +44,10 @@ data class DiscordBot(
                 } else {
                     null
                 }
+            } catch (e: InvalidTokenException) {
+                LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
+                null
             }
-            bot
-        } catch (e: InvalidTokenException) {
-            LoggerFactory.getLogger("DiscordBot-Builder").error("Error with token: $token, message: ${e.message}")
         }
     }
 
